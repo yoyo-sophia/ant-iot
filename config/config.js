@@ -16,11 +16,11 @@ const plugins = [
       dva: {
         hmr: true,
       },
-      locale: {
-        enable: true, // default false
-        default: 'zh-CN', // default zh-CN
-        baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
-      },
+      // locale: {
+      //   enable: true, // default false
+      //   default: 'zh-CN', // default zh-CN
+      //   baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
+      // },
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
         webpackChunkName: true,

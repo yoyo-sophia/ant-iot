@@ -1,249 +1,189 @@
-import React, { Component } from 'react';
-import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
+import React, { Component, Suspense } from 'react';
 import { connect } from 'dva';
-import { formatMessage, FormattedMessage } from 'umi/locale';
-import { Row, Col, Card, Tooltip } from 'antd';
-import { Pie, WaterWave, Gauge, TagCloud } from '@/components/Charts';
-import NumberInfo from '@/components/NumberInfo';
-import CountDown from '@/components/CountDown';
-import ActiveChart from '@/components/ActiveChart';
-import numeral from 'numeral';
+import { Row, Col, Icon, Menu, Dropdown } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
-import Authorized from '@/utils/Authorized';
-import styles from './Monitor.less';
+import { getTimeDistance } from '@/utils/utils';
+import styles from './Analysis.less';
+import PageLoading from '@/components/PageLoading';
+// import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
 
-const { Secured } = Authorized;
+// const IntroduceRow = React.lazy(() => import('./IntroduceRow'));
+// const SalesCard = React.lazy(() => import('./SalesCard'));
+// const TopSearch = React.lazy(() => import('./TopSearch'));
+// const ProportionSales = React.lazy(() => import('./ProportionSales'));
+// const OfflineData = React.lazy(() => import('./OfflineData'));
 
-const targetTime = new Date().getTime() + 3900000;
-
-// use permission as a parameter
-const havePermissionAsync = new Promise(resolve => {
-  // Call resolve on behalf of passed
-  setTimeout(() => resolve(), 300);
-});
-
-@Secured(havePermissionAsync)
-@connect(({ monitor, loading }) => ({
-  monitor,
-  loading: loading.models.monitor,
+@connect(({ chart, loading }) => ({
+  chart,
+  loading: loading.effects['chart/fetch'],
 }))
-class Monitor extends Component {
+class Analysis extends Component {
+  state = {
+    salesType: 'all',
+    currentTabKey: '',
+    rangePickerValue: getTimeDistance('year'),
+  };
+
   componentDidMount() {
+    console.log('run');
     const { dispatch } = this.props;
-    dispatch({
-      type: 'monitor/fetchTags',
+    this.reqRef = requestAnimationFrame(() => {
+      dispatch({
+        type: 'chart/fetch',
+      });
     });
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'chart/clear',
+    });
+    cancelAnimationFrame(this.reqRef);
+    clearTimeout(this.timeoutId);
+  }
+
+  handleChangeSalesType = e => {
+    this.setState({
+      salesType: e.target.value,
+    });
+  };
+
+  handleTabChange = key => {
+    this.setState({
+      currentTabKey: key,
+    });
+  };
+
+  handleRangePickerChange = rangePickerValue => {
+    const { dispatch } = this.props;
+    this.setState({
+      rangePickerValue,
+    });
+
+    dispatch({
+      type: 'chart/fetchSalesData',
+    });
+  };
+
+  selectDate = type => {
+    const { dispatch } = this.props;
+    this.setState({
+      rangePickerValue: getTimeDistance(type),
+    });
+
+    dispatch({
+      type: 'chart/fetchSalesData',
+    });
+  };
+
+  isActive = type => {
+    const { rangePickerValue } = this.state;
+    const value = getTimeDistance(type);
+    if (!rangePickerValue[0] || !rangePickerValue[1]) {
+      return '';
+    }
+    if (
+      rangePickerValue[0].isSame(value[0], 'day') &&
+      rangePickerValue[1].isSame(value[1], 'day')
+    ) {
+      return styles.currentDate;
+    }
+    return '';
+  };
+
   render() {
-    const { monitor, loading } = this.props;
-    const { tags } = monitor;
+    const { rangePickerValue, salesType, currentTabKey } = this.state;
+    const { chart, loading } = this.props;
+    const {
+      visitData,
+      visitData2,
+      salesData,
+      searchData,
+      offlineData,
+      offlineChartData,
+      salesTypeData,
+      salesTypeDataOnline,
+      salesTypeDataOffline,
+    } = chart;
+    let salesPieData;
+    if (salesType === 'all') {
+      salesPieData = salesTypeData;
+    } else {
+      salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
+    }
+    const menu = (
+      <Menu>
+        <Menu.Item>操作一</Menu.Item>
+        <Menu.Item>操作二</Menu.Item>
+      </Menu>
+    );
+
+    const dropdownGroup = (
+      <span className={styles.iconGroup}>
+        <Dropdown overlay={menu} placement="bottomRight">
+          <Icon type="ellipsis" />
+        </Dropdown>
+      </span>
+    );
+
+    const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
 
     return (
       <GridContent>
-        <Row gutter={24}>
-          <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.trading-activity"
-                  defaultMessage="Real-Time Trading Activity"
-                />
-              }
-              bordered={false}
-            >
-              <Row>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.total-transactions"
-                        defaultMessage="Total transactions today"
-                      />
-                    }
-                    suffix="元"
-                    total={numeral(124543233).format('0,0')}
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.sales-target"
-                        defaultMessage="Sales target completion rate"
-                      />
-                    }
-                    total="92%"
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.remaining-time"
-                        defaultMessage="Remaining time of activity"
-                      />
-                    }
-                    total={<CountDown target={targetTime} />}
-                  />
-                </Col>
-                <Col md={6} sm={12} xs={24}>
-                  <NumberInfo
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.total-transactions-per-second"
-                        defaultMessage="Total transactions per second"
-                      />
-                    }
-                    suffix="元"
-                    total={numeral(234).format('0,0')}
-                  />
-                </Col>
-              </Row>
-              <div className={styles.mapChart}>
-                <Tooltip
-                  title={
-                    <FormattedMessage
-                      id="app.monitor.waiting-for-implementation"
-                      defaultMessage="Waiting for implementation"
-                    />
-                  }
-                >
-                  <img
-                    src="https://gw.alipayobjects.com/zos/antfincdn/h%24wFbzuuzz/HBWnDEUXCnGnGrRfrpKa.png"
-                    alt="map"
-                  />
-                </Tooltip>
-              </div>
-            </Card>
-          </Col>
-          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.activity-forecast"
-                  defaultMessage="Activity forecast"
-                />
-              }
-              style={{ marginBottom: 24 }}
-              bordered={false}
-            >
-              <ActiveChart />
-            </Card>
-            <Card
-              title={<FormattedMessage id="app.monitor.efficiency" defaultMessage="Efficiency" />}
-              style={{ marginBottom: 24 }}
-              bodyStyle={{ textAlign: 'center' }}
-              bordered={false}
-            >
-              <Gauge
-                title={formatMessage({ id: 'app.monitor.ratio', defaultMessage: 'Ratio' })}
-                height={180}
-                percent={87}
-              />
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col xl={12} lg={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.proportion-per-category"
-                  defaultMessage="Proportion Per Category"
-                />
-              }
-              bordered={false}
-              className={styles.pieCard}
-            >
-              <Row style={{ padding: '16px 0' }}>
-                <Col span={8}>
-                  <Pie
-                    animate={false}
-                    percent={28}
-                    subTitle={
-                      <FormattedMessage id="app.monitor.fast-food" defaultMessage="Fast food" />
-                    }
-                    total="28%"
-                    height={128}
-                    lineWidth={2}
-                  />
-                </Col>
-                <Col span={8}>
-                  <Pie
-                    animate={false}
-                    color="#5DDECF"
-                    percent={22}
-                    subTitle={
-                      <FormattedMessage
-                        id="app.monitor.western-food"
-                        defaultMessage="Western food"
-                      />
-                    }
-                    total="22%"
-                    height={128}
-                    lineWidth={2}
-                  />
-                </Col>
-                <Col span={8}>
-                  <Pie
-                    animate={false}
-                    color="#2FC25B"
-                    percent={32}
-                    subTitle={
-                      <FormattedMessage id="app.monitor.hot-pot" defaultMessage="Hot pot" />
-                    }
-                    total="32%"
-                    height={128}
-                    lineWidth={2}
-                  />
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-          <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.popular-searches"
-                  defaultMessage="Popular Searches"
-                />
-              }
-              loading={loading}
-              bordered={false}
-              bodyStyle={{ overflow: 'hidden' }}
-            >
-              <TagCloud data={tags} height={161} />
-            </Card>
-          </Col>
-          <Col xl={6} lg={12} sm={24} xs={24} style={{ marginBottom: 24 }}>
-            <Card
-              title={
-                <FormattedMessage
-                  id="app.monitor.resource-surplus"
-                  defaultMessage="Resource Surplus"
-                />
-              }
-              bodyStyle={{ textAlign: 'center', fontSize: 0 }}
-              bordered={false}
-            >
-              <WaterWave
-                height={161}
-                title={
-                  <FormattedMessage id="app.monitor.fund-surplus" defaultMessage="Fund Surplus" />
-                }
-                percent={34}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <Suspense fallback={<PageLoading />}>
+          {/*<IntroduceRow loading={loading} visitData={visitData} />*/}
+        </Suspense>
+        <Suspense fallback={null}>
+          {/*<SalesCard*/}
+          {/*rangePickerValue={rangePickerValue}*/}
+          {/*salesData={salesData}*/}
+          {/*isActive={this.isActive}*/}
+          {/*handleRangePickerChange={this.handleRangePickerChange}*/}
+          {/*loading={loading}*/}
+          {/*selectDate={this.selectDate}*/}
+          {/*/>*/}
+        </Suspense>
+        <div className={styles.twoColLayout}>
+          <Row gutter={24}>
+            <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+              <Suspense fallback={null}>
+                {/*<TopSearch*/}
+                {/*loading={loading}*/}
+                {/*visitData2={visitData2}*/}
+                {/*selectDate={this.selectDate}*/}
+                {/*searchData={searchData}*/}
+                {/*dropdownGroup={dropdownGroup}*/}
+                {/*/>*/}
+              </Suspense>
+            </Col>
+            <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+              <Suspense fallback={null}>
+                {/*<ProportionSales*/}
+                {/*dropdownGroup={dropdownGroup}*/}
+                {/*salesType={salesType}*/}
+                {/*loading={loading}*/}
+                {/*salesPieData={salesPieData}*/}
+                {/*handleChangeSalesType={this.handleChangeSalesType}*/}
+                {/*/>*/}
+              </Suspense>
+            </Col>
+          </Row>
+        </div>
+        <Suspense fallback={null}>
+          {/*<OfflineData*/}
+          {/*activeKey={activeKey}*/}
+          {/*loading={loading}*/}
+          {/*offlineData={offlineData}*/}
+          {/*offlineChartData={offlineChartData}*/}
+          {/*handleTabChange={this.handleTabChange}*/}
+          {/*/>*/}
+        </Suspense>
       </GridContent>
     );
   }
 }
 
-export default props => (
-  <AsyncLoadBizCharts>
-    <Monitor {...props} />
-  </AsyncLoadBizCharts>
-);
+export default props => ({
+  ...props
+});

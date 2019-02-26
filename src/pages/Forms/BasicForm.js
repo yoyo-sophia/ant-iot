@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   Form,
   Input,
@@ -76,57 +75,57 @@ class BasicForms extends PureComponent {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.title.required' }),
+                    message: '请输入标题',
                   },
                 ],
-              })(<Input placeholder={formatMessage({ id: 'form.title.placeholder' })} />)}
+              })(<Input placeholder='给目标起个名字' />)}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.date.label" />}>
+            <FormItem {...formItemLayout} label='起止日期'>
               {getFieldDecorator('date', {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.date.required' }),
+                    message:'请选择起止日期',
                   },
                 ],
               })(
                 <RangePicker
                   style={{ width: '100%' }}
                   placeholder={[
-                    formatMessage({ id: 'form.date.placeholder.start' }),
-                    formatMessage({ id: 'form.date.placeholder.end' }),
+                    '开始日期',
+                    '结束日期'
                   ]}
                 />
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.goal.label" />}>
+            <FormItem {...formItemLayout} label='目标描述'>
               {getFieldDecorator('goal', {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.goal.required' }),
+                    message:'请输入目标描述',
                   },
                 ],
               })(
                 <TextArea
                   style={{ minHeight: 32 }}
-                  placeholder={formatMessage({ id: 'form.goal.placeholder' })}
+                  placeholder='请输入你的阶段性工作目标'
                   rows={4}
                 />
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.standard.label" />}>
+            <FormItem {...formItemLayout} label='衡量标准'>
               {getFieldDecorator('standard', {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.standard.required' }),
+                    message: '请输入衡量标准',
                   },
                 ],
               })(
                 <TextArea
                   style={{ minHeight: 32 }}
-                  placeholder={formatMessage({ id: 'form.standard.placeholder' })}
+                  placeholder='请输入衡量标准'
                   rows={4}
                 />
               )}
@@ -135,10 +134,10 @@ class BasicForms extends PureComponent {
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.client.label" />
+                  目标的服务对象
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
-                    <Tooltip title={<FormattedMessage id="form.client.label.tooltip" />}>
+                   （选填）
+                    <Tooltip title='目标的服务对象'>
                       <Icon type="info-circle-o" style={{ marginRight: 4 }} />
                     </Tooltip>
                   </em>
@@ -146,38 +145,38 @@ class BasicForms extends PureComponent {
               }
             >
               {getFieldDecorator('client')(
-                <Input placeholder={formatMessage({ id: 'form.client.placeholder' })} />
+                <Input placeholder='请描述你服务的客户，内部客户直接 @姓名／工号' />
               )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.invites.label" />
+                  邀评人
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
+                    （选填）
                   </em>
                 </span>
               }
             >
               {getFieldDecorator('invites')(
-                <Input placeholder={formatMessage({ id: 'form.invites.placeholder' })} />
+                <Input placeholder='请直接 @姓名／工号，最多可邀请 5 人' />
               )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.weight.label" />
+                  权重
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
+                   （选填）
                   </em>
                 </span>
               }
             >
               {getFieldDecorator('weight')(
                 <InputNumber
-                  placeholder={formatMessage({ id: 'form.weight.placeholder' })}
+                  placeholder='请输入'
                   min={0}
                   max={100}
                 />
@@ -186,8 +185,8 @@ class BasicForms extends PureComponent {
             </FormItem>
             <FormItem
               {...formItemLayout}
-              label={<FormattedMessage id="form.public.label" />}
-              help={<FormattedMessage id="form.public.label.help" />}
+              label='目标公开'
+              help='客户、邀评人默认被分享'
             >
               <div>
                 {getFieldDecorator('public', {
@@ -195,13 +194,13 @@ class BasicForms extends PureComponent {
                 })(
                   <Radio.Group>
                     <Radio value="1">
-                      <FormattedMessage id="form.public.radio.public" />
+                      公开
                     </Radio>
                     <Radio value="2">
-                      <FormattedMessage id="form.public.radio.partially-public" />
+                      部分公开
                     </Radio>
                     <Radio value="3">
-                      <FormattedMessage id="form.public.radio.private" />
+                      不公开
                     </Radio>
                   </Radio.Group>
                 )}
@@ -209,20 +208,20 @@ class BasicForms extends PureComponent {
                   {getFieldDecorator('publicUsers')(
                     <Select
                       mode="multiple"
-                      placeholder={formatMessage({ id: 'form.publicUsers.placeholder' })}
+                      placeholder='公开给'
                       style={{
                         margin: '8px 0',
                         display: getFieldValue('public') === '2' ? 'block' : 'none',
                       }}
                     >
                       <Option value="1">
-                        <FormattedMessage id="form.publicUsers.option.A" />
+                        同事甲
                       </Option>
                       <Option value="2">
-                        <FormattedMessage id="form.publicUsers.option.B" />
+                        同事乙
                       </Option>
                       <Option value="3">
-                        <FormattedMessage id="form.publicUsers.option.C" />
+                        同事丙
                       </Option>
                     </Select>
                   )}
@@ -231,10 +230,10 @@ class BasicForms extends PureComponent {
             </FormItem>
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                <FormattedMessage id="form.submit" />
+                提交
               </Button>
               <Button style={{ marginLeft: 8 }}>
-                <FormattedMessage id="form.save" />
+                保存
               </Button>
             </FormItem>
           </Form>

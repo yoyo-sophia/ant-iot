@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { FormattedMessage } from 'umi/locale';
 import { Menu } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import styles from './Info.less';
@@ -16,18 +15,15 @@ class Info extends Component {
     super(props);
     const { match, location } = props;
     const menuMap = {
-      base: <FormattedMessage id="app.settings.menuMap.basic" defaultMessage="Basic Settings" />,
+      base: '基本设置',
       security: (
-        <FormattedMessage id="app.settings.menuMap.security" defaultMessage="Security Settings" />
+        '安全设置'
       ),
       binding: (
-        <FormattedMessage id="app.settings.menuMap.binding" defaultMessage="Account Binding" />
+        '账号绑定'
       ),
       notification: (
-        <FormattedMessage
-          id="app.settings.menuMap.notification"
-          defaultMessage="New Message Notification"
-        />
+        '新消息通知'
       ),
     };
     const key = location.pathname.replace(`${match.path}/`, '');

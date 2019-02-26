@@ -7,7 +7,7 @@ export default [
       { path: '/user', redirect: '/user/login' },
       { path: '/user/login', component: './User/Login' },
       { path: '/user/register', component: './User/Register' },
-      { path: '/user/register-result', component: './User/RegisterResult' },
+      // { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
   // app
@@ -43,51 +43,51 @@ export default [
         ],
       },
       // forms
-      {
-        path: '/form',
-        icon: 'form',
-        name: 'form',
-        routes: [
-          {
-            path: '/form/basic-form',
-            name: 'basicform',
-            component: './Forms/BasicForm',
-          },
-          {
-            path: '/form/step-form',
-            name: 'stepform',
-            component: './Forms/StepForm',
-            hideChildrenInMenu: true,
-            routes: [
-              {
-                path: '/form/step-form',
-                redirect: '/form/step-form/info',
-              },
-              {
-                path: '/form/step-form/info',
-                name: 'info',
-                component: './Forms/StepForm/Step1',
-              },
-              {
-                path: '/form/step-form/confirm',
-                name: 'confirm',
-                component: './Forms/StepForm/Step2',
-              },
-              {
-                path: '/form/step-form/result',
-                name: 'result',
-                component: './Forms/StepForm/Step3',
-              },
-            ],
-          },
-          {
-            path: '/form/advanced-form',
-            name: 'advancedform',
-            authority: ['admin'],
-            component: './Forms/AdvancedForm',
-          },
-        ],
-      },
+      // {
+      //   path: '/form',
+      //   icon: 'form',
+      //   name: 'form',
+      //   routes: [
+      //     {
+      //       path: '/form/basic-form',
+      //       name: 'basicform',
+      //       component: './Forms/BasicForm',
+      //     },
+      //     {
+      //       path: '/form/step-form',
+      //       name: 'stepform',
+      //       component: './Forms/StepForm',
+      //       hideChildrenInMenu: true,
+      //       routes: [
+      //         {
+      //           path: '/form/step-form',
+      //           redirect: '/form/step-form/info',
+      //         },
+      //         {
+      //           path: '/form/step-form/info',
+      //           name: 'info',
+      //           component: './Forms/StepForm/Step1',
+      //         },
+      //         {
+      //           path: '/form/step-form/confirm',
+      //           name: 'confirm',
+      //           component: './Forms/StepForm/Step2',
+      //         },
+      //         {
+      //           path: '/form/step-form/result',
+      //           name: 'result',
+      //           component: './Forms/StepForm/Step3',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       path: '/form/advanced-form',
+      //       name: 'advancedform',
+      //       authority: ['admin'],
+      //       component: './Forms/AdvancedForm',
+      //     },
+      //   ],
+      // },
       // list
       {
         path: '/list',
@@ -113,27 +113,27 @@ export default [
             path: '/list/search',
             name: 'searchlist',
             component: './List/List',
-            routes: [
-              {
-                path: '/list/search',
-                redirect: '/list/search/articles',
-              },
-              {
-                path: '/list/search/articles',
-                name: 'articles',
-                component: './List/Articles',
-              },
-              {
-                path: '/list/search/projects',
-                name: 'projects',
-                component: './List/Projects',
-              },
-              {
-                path: '/list/search/applications',
-                name: 'applications',
-                component: './List/Applications',
-              },
-            ],
+            // routes: [
+            //   {
+            //     path: '/list/search',
+            //     redirect: '/list/search/articles',
+            //   },
+            //   {
+            //     path: '/list/search/articles',
+            //     name: 'articles',
+            //     component: './List/Articles',
+            //   },
+            //   {
+            //     path: '/list/search/projects',
+            //     name: 'projects',
+            //     component: './List/Projects',
+            //   },
+            //   {
+            //     path: '/list/search/applications',
+            //     name: 'applications',
+            //     component: './List/Applications',
+            //   },
+            // ],
           },
         ],
       },
@@ -162,20 +162,20 @@ export default [
           },
         ],
       },
-      {
-        name: 'result',
-        icon: 'check-circle-o',
-        path: '/result',
-        routes: [
-          // result
-          {
-            path: '/result/success',
-            name: 'success',
-            component: './Result/Success',
-          },
-          { path: '/result/fail', name: 'fail', component: './Result/Error' },
-        ],
-      },
+      // {
+      //   name: 'result',
+      //   icon: 'check-circle-o',
+      //   path: '/result',
+      //   routes: [
+      //     // result
+      //     {
+      //       path: '/result/success',
+      //       name: 'success',
+      //       component: './Result/Success',
+      //     },
+      //     { path: '/result/fail', name: 'fail', component: './Result/Error' },
+      //   ],
+      // },
       {
         name: 'exception',
         icon: 'warning',

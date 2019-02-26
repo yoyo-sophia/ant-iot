@@ -5,13 +5,13 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import { getTimeDistance } from '@/utils/utils';
 import styles from './Analysis.less';
 import PageLoading from '@/components/PageLoading';
-import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
+// import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
 
-const IntroduceRow = React.lazy(() => import('./IntroduceRow'));
-const SalesCard = React.lazy(() => import('./SalesCard'));
-const TopSearch = React.lazy(() => import('./TopSearch'));
-const ProportionSales = React.lazy(() => import('./ProportionSales'));
-const OfflineData = React.lazy(() => import('./OfflineData'));
+// const IntroduceRow = React.lazy(() => import('./IntroduceRow'));
+// const SalesCard = React.lazy(() => import('./SalesCard'));
+// const TopSearch = React.lazy(() => import('./TopSearch'));
+// const ProportionSales = React.lazy(() => import('./ProportionSales'));
+// const OfflineData = React.lazy(() => import('./OfflineData'));
 
 @connect(({ chart, loading }) => ({
   chart,
@@ -132,52 +132,52 @@ class Analysis extends Component {
     return (
       <GridContent>
         <Suspense fallback={<PageLoading />}>
-          <IntroduceRow loading={loading} visitData={visitData} />
+          {/*<IntroduceRow loading={loading} visitData={visitData} />*/}
         </Suspense>
         <Suspense fallback={null}>
-          <SalesCard
-            rangePickerValue={rangePickerValue}
-            salesData={salesData}
-            isActive={this.isActive}
-            handleRangePickerChange={this.handleRangePickerChange}
-            loading={loading}
-            selectDate={this.selectDate}
-          />
+          {/*<SalesCard*/}
+            {/*rangePickerValue={rangePickerValue}*/}
+            {/*salesData={salesData}*/}
+            {/*isActive={this.isActive}*/}
+            {/*handleRangePickerChange={this.handleRangePickerChange}*/}
+            {/*loading={loading}*/}
+            {/*selectDate={this.selectDate}*/}
+          {/*/>*/}
         </Suspense>
         <div className={styles.twoColLayout}>
           <Row gutter={24}>
             <Col xl={12} lg={24} md={24} sm={24} xs={24}>
               <Suspense fallback={null}>
-                <TopSearch
-                  loading={loading}
-                  visitData2={visitData2}
-                  selectDate={this.selectDate}
-                  searchData={searchData}
-                  dropdownGroup={dropdownGroup}
-                />
+                {/*<TopSearch*/}
+                  {/*loading={loading}*/}
+                  {/*visitData2={visitData2}*/}
+                  {/*selectDate={this.selectDate}*/}
+                  {/*searchData={searchData}*/}
+                  {/*dropdownGroup={dropdownGroup}*/}
+                {/*/>*/}
               </Suspense>
             </Col>
             <Col xl={12} lg={24} md={24} sm={24} xs={24}>
               <Suspense fallback={null}>
-                <ProportionSales
-                  dropdownGroup={dropdownGroup}
-                  salesType={salesType}
-                  loading={loading}
-                  salesPieData={salesPieData}
-                  handleChangeSalesType={this.handleChangeSalesType}
-                />
+                {/*<ProportionSales*/}
+                  {/*dropdownGroup={dropdownGroup}*/}
+                  {/*salesType={salesType}*/}
+                  {/*loading={loading}*/}
+                  {/*salesPieData={salesPieData}*/}
+                  {/*handleChangeSalesType={this.handleChangeSalesType}*/}
+                {/*/>*/}
               </Suspense>
             </Col>
           </Row>
         </div>
         <Suspense fallback={null}>
-          <OfflineData
-            activeKey={activeKey}
-            loading={loading}
-            offlineData={offlineData}
-            offlineChartData={offlineChartData}
-            handleTabChange={this.handleTabChange}
-          />
+          {/*<OfflineData*/}
+            {/*activeKey={activeKey}*/}
+            {/*loading={loading}*/}
+            {/*offlineData={offlineData}*/}
+            {/*offlineChartData={offlineChartData}*/}
+            {/*handleTabChange={this.handleTabChange}*/}
+          {/*/>*/}
         </Suspense>
       </GridContent>
     );
@@ -185,7 +185,5 @@ class Analysis extends Component {
 }
 
 export default props => (
-  <AsyncLoadBizCharts>
-    <Analysis {...props} />
-  </AsyncLoadBizCharts>
+  {...props}
 );

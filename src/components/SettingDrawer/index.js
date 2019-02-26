@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Select, message, Drawer, List, Switch, Divider, Icon, Button, Alert, Tooltip } from 'antd';
-import { formatMessage } from 'umi/locale';
+// import { formatMessage } from 'umi/locale';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
 import omit from 'omit.js';
@@ -34,7 +34,8 @@ class SettingDrawer extends PureComponent {
     } = this.props;
     return [
       {
-        title: formatMessage({ id: 'app.setting.content-width' }),
+        title:'内容区域宽度',
+        // title: formatMessage({ id: 'app.setting.content-width' }),
         action: (
           <Select
             value={contentWidth}
@@ -44,17 +45,20 @@ class SettingDrawer extends PureComponent {
           >
             {layout === 'sidemenu' ? null : (
               <Option value="Fixed">
-                {formatMessage({ id: 'app.setting.content-width.fixed' })}
+                '定宽'
+                {/*{formatMessage({ id: 'app.setting.content-width.fixed' })}*/}
               </Option>
             )}
             <Option value="Fluid">
-              {formatMessage({ id: 'app.setting.content-width.fluid' })}
+              '流式'
+              {/*{formatMessage({ id: 'app.setting.content-width.fluid' })}*/}
             </Option>
           </Select>
         ),
       },
       {
-        title: formatMessage({ id: 'app.setting.fixedheader' }),
+        // title: formatMessage({ id: 'app.setting.fixedheader' }),
+        title:'固定 Header',
         action: (
           <Switch
             size="small"
@@ -64,9 +68,11 @@ class SettingDrawer extends PureComponent {
         ),
       },
       {
-        title: formatMessage({ id: 'app.setting.hideheader' }),
+        // title: formatMessage({ id: 'app.setting.hideheader' }),
+        title:'下滑时隐藏 Header',
         disabled: !fixedHeader,
-        disabledReason: formatMessage({ id: 'app.setting.hideheader.hint' }),
+        disabledReason: '固定 Header 时可配置',
+        // disabledReason: formatMessage({ id: 'app.setting.hideheader.hint' }),
         action: (
           <Switch
             size="small"
@@ -76,9 +82,11 @@ class SettingDrawer extends PureComponent {
         ),
       },
       {
-        title: formatMessage({ id: 'app.setting.fixedsidebar' }),
+        // title: formatMessage({ id: 'app.setting.fixedsidebar' }),
+        title: '固定侧边菜单',
         disabled: layout === 'topmenu',
-        disabledReason: formatMessage({ id: 'app.setting.fixedsidebar.hint' }),
+        // disabledReason: formatMessage({ id: 'app.setting.fixedsidebar.hint' }),
+        disabledReason: '侧边菜单布局时可配置',
         action: (
           <Switch
             size="small"
@@ -153,18 +161,21 @@ class SettingDrawer extends PureComponent {
         }}
       >
         <div className={styles.content}>
-          <Body title={formatMessage({ id: 'app.setting.pagestyle' })}>
+          <Body title={'整体风格设置'}>
+          {/*<Body title={formatMessage({ id: 'app.setting.pagestyle' })}>*/}
             <BlockCheckbox
               list={[
                 {
                   key: 'dark',
                   url: 'https://gw.alipayobjects.com/zos/rmsportal/LCkqqYNmvBEbokSDscrm.svg',
-                  title: formatMessage({ id: 'app.setting.pagestyle.dark' }),
+                  // title: formatMessage({ id: 'app.setting.pagestyle.dark' }),
+                  title: '暗色菜单风格',
                 },
                 {
                   key: 'light',
                   url: 'https://gw.alipayobjects.com/zos/rmsportal/jpRkZQMyYRryryPNtyIC.svg',
-                  title: formatMessage({ id: 'app.setting.pagestyle.light' }),
+                  // title: formatMessage({ id: 'app.setting.pagestyle.light' }),
+                  title: '亮色菜单风格',
                 },
               ]}
               value={navTheme}
@@ -173,25 +184,29 @@ class SettingDrawer extends PureComponent {
           </Body>
 
           <ThemeColor
-            title={formatMessage({ id: 'app.setting.themecolor' })}
+            title={'主题色'}
+            // title={formatMessage({ id: 'app.setting.themecolor' })}
             value={primaryColor}
             onChange={color => this.changeSetting('primaryColor', color)}
           />
 
           <Divider />
 
-          <Body title={formatMessage({ id: 'app.setting.navigationmode' })}>
+          <Body title={'导航模式'}>
+          {/*<Body title={formatMessage({ id: 'app.setting.navigationmode' })}>*/}
             <BlockCheckbox
               list={[
                 {
                   key: 'sidemenu',
                   url: 'https://gw.alipayobjects.com/zos/rmsportal/JopDzEhOqwOjeNTXkoje.svg',
-                  title: formatMessage({ id: 'app.setting.sidemenu' }),
+                  // title: formatMessage({ id: 'app.setting.sidemenu' }),
+                  title:'侧边菜单布局',
                 },
                 {
                   key: 'topmenu',
                   url: 'https://gw.alipayobjects.com/zos/rmsportal/KDNDBbriJhLwuqMoxcAr.svg',
-                  title: formatMessage({ id: 'app.setting.topmenu' }),
+                  // title: formatMessage({ id: 'app.setting.topmenu' }),
+                  title:'顶部菜单布局'
                 },
               ]}
               value={layout}
@@ -207,7 +222,8 @@ class SettingDrawer extends PureComponent {
 
           <Divider />
 
-          <Body title={formatMessage({ id: 'app.setting.othersettings' })}>
+          <Body title={'其他设置'}>
+          {/*<Body title={formatMessage({ id: 'app.setting.othersettings' })}>*/}
             <List.Item
               actions={[
                 <Switch
@@ -217,16 +233,19 @@ class SettingDrawer extends PureComponent {
                 />,
               ]}
             >
-              {formatMessage({ id: 'app.setting.weakmode' })}
+              {'色弱模式'}
+              {/*{formatMessage({ id: 'app.setting.weakmode' })}*/}
             </List.Item>
           </Body>
           <Divider />
           <CopyToClipboard
             text={JSON.stringify(omit(setting, ['colorWeak']), null, 2)}
-            onCopy={() => message.success(formatMessage({ id: 'app.setting.copyinfo' }))}
+            onCopy={() => message.success('拷贝成功，请到 src/defaultSettings.js 中替换默认配置')}
+            // onCopy={() => message.success(formatMessage({ id: 'app.setting.copyinfo' }))}
           >
             <Button block icon="copy">
-              {formatMessage({ id: 'app.setting.copy' })}
+              {'拷贝设置'}
+              {/*{formatMessage({ id: 'app.setting.copy' })}*/}
             </Button>
           </CopyToClipboard>
           <Alert
@@ -234,7 +253,8 @@ class SettingDrawer extends PureComponent {
             className={styles.productionHint}
             message={
               <div>
-                {formatMessage({ id: 'app.setting.production.hint' })}{' '}
+                {'配置栏只在开发环境用于预览，生产环境不会展现，请拷贝后手动修改配置文件'}{' '}
+                {/*{formatMessage({ id: 'app.setting.production.hint' })}{' '}*/}
                 <a
                   href="https://u.ant.design/pro-v2-default-settings"
                   target="_blank"

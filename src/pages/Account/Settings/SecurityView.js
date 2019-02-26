@@ -1,23 +1,21 @@
 import React, { Component, Fragment } from 'react';
-import { formatMessage, FormattedMessage } from 'umi/locale';
 import { List } from 'antd';
 // import { getTimeDistance } from '@/utils/utils';
 
 const passwordStrength = {
   strong: (
     <font className="strong">
-      <FormattedMessage id="app.settings.security.strong" defaultMessage="Strong" />
+      强
     </font>
   ),
   medium: (
     <font className="medium">
-      <FormattedMessage id="app.settings.security.medium" defaultMessage="Medium" />
+      中
     </font>
   ),
   weak: (
     <font className="weak">
-      <FormattedMessage id="app.settings.security.weak" defaultMessage="Weak" />
-      Weak
+      弱
     </font>
   ),
 };
@@ -25,61 +23,38 @@ const passwordStrength = {
 class SecurityView extends Component {
   getData = () => [
     {
-      title: formatMessage({ id: 'app.settings.security.password' }, {}),
+      title: '账户密码',
       description: (
         <Fragment>
-          {formatMessage({ id: 'app.settings.security.password-description' })}：
+          账户密码：
           {passwordStrength.strong}
         </Fragment>
       ),
       actions: [
-        <a>
-          <FormattedMessage id="app.settings.security.modify" defaultMessage="Modify" />
-        </a>,
+        <a>修改</a>,
       ],
     },
     {
-      title: formatMessage({ id: 'app.settings.security.phone' }, {}),
-      description: `${formatMessage(
-        { id: 'app.settings.security.phone-description' },
-        {}
-      )}：138****8293`,
+      title: '密保手机',
+      description: "已绑定手机:'138****8293'",
       actions: [
-        <a>
-          <FormattedMessage id="app.settings.security.modify" defaultMessage="Modify" />
-        </a>,
+        <a>修改</a>,
       ],
     },
     {
-      title: formatMessage({ id: 'app.settings.security.question' }, {}),
-      description: formatMessage({ id: 'app.settings.security.question-description' }, {}),
+      title: '密保问题',
+      description: '未设置密保问题，密保问题可有效保护账户安全',
       actions: [
-        <a>
-          <FormattedMessage id="app.settings.security.set" defaultMessage="Set" />
-        </a>,
+        <a>设置</a>,
       ],
     },
     {
-      title: formatMessage({ id: 'app.settings.security.email' }, {}),
-      description: `${formatMessage(
-        { id: 'app.settings.security.email-description' },
-        {}
-      )}：ant***sign.com`,
+      title: '备用邮箱',
+      description: `已绑定邮箱：ant***sign.com`,
       actions: [
-        <a>
-          <FormattedMessage id="app.settings.security.modify" defaultMessage="Modify" />
-        </a>,
+        <a>修改</a>,
       ],
-    },
-    {
-      title: formatMessage({ id: 'app.settings.security.mfa' }, {}),
-      description: formatMessage({ id: 'app.settings.security.mfa-description' }, {}),
-      actions: [
-        <a>
-          <FormattedMessage id="app.settings.security.bind" defaultMessage="Bind" />
-        </a>,
-      ],
-    },
+    }
   ];
 
   render() {

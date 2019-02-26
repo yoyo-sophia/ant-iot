@@ -3,8 +3,8 @@ import moment from 'moment';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import { Row, Col, Card, List, Avatar } from 'antd';
-import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
-import { Radar } from '@/components/Charts';
+// import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
+// import { Radar } from '@/components/Charts';
 import EditableLinkGroup from '@/components/EditableLinkGroup';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -224,7 +224,7 @@ class Workplace extends PureComponent {
               loading={radarData.length === 0}
             >
               <div className={styles.chart}>
-                <Radar hasLegend height={343} data={radarData} />
+                {/*<Radar hasLegend height={343} data={radarData} />*/}
               </div>
             </Card>
             <Card
@@ -254,7 +254,5 @@ class Workplace extends PureComponent {
 }
 
 export default props => (
-  <AsyncLoadBizCharts>
-    <Workplace {...props} />
-  </AsyncLoadBizCharts>
+  {...props}
 );

@@ -22,7 +22,7 @@ import {
 } from 'antd';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import Result from '@/components/Result';
+// import Result from '@/components/Result';
 
 import styles from './BasicList.less';
 

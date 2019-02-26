@@ -3,24 +3,20 @@ const mock_menu = [
     path: '/dashboard',
     name: 'Dashboard',
     icon: 'dashboard',
-    locale: 'menu.dashboard',
     authority: ['admin', 'user'],
     children: [{
       // authority: undefined,
       exact: true,
-      // locale: "menu.dashboard.analysis",
       name: "分析页",
       path: "/dashboard/analysis",
     }, {
       // authority: undefined,
       exact: true,
-      // locale: "menu.dashboard.monitor",
       name: "监控页",
       path: "/dashboard/monitor",
     }, {
       // authority: undefined,
       exact: true,
-      // locale: "menu.dashboard.workplace",
       name: "工作台",
       path: "/dashboard/workplace",
     }],
@@ -28,17 +24,17 @@ const mock_menu = [
   {
     path: '/form',
     icon: 'form',
-    name: 'form',
+    name: '表单',
     routes: [
       {
         path: '/form/basic-form',
-        name: 'basicform',
+        name: '基础表单',
       },
       {
         path: '/form/step-form',
-        name: 'stepform',
-        hideChildrenInMenu: true,
-        routes: [
+        name: '分步表单',
+        // hideChildrenInMenu: true,
+        children: [
           {
             path: '/form/step-form',
             redirect: '/form/step-form/info',
@@ -62,11 +58,187 @@ const mock_menu = [
       },
       {
         path: '/form/advanced-form',
-        name: 'advancedform',
+        name: '高级表单',
         authority: ['admin'],
       },
     ],
   },
+  {
+    path: '/list',
+    icon: 'table',
+    name: 'list',
+    routes: [
+      {
+        path: '/list/table-list',
+        name: 'searchtable',
+        component: './List/TableList',
+      },
+      {
+        path: '/list/basic-list',
+        name: 'basiclist',
+        component: './List/BasicList',
+      },
+      {
+        path: '/list/card-list',
+        name: 'cardlist',
+        component: './List/CardList',
+      },
+      {
+        path: '/list/search',
+        name: 'searchlist',
+        component: './List/List',
+        routes: [
+          {
+            path: '/list/search',
+            redirect: '/list/search/articles',
+          },
+          {
+            path: '/list/search/articles',
+            name: 'articles',
+            component: './List/Articles',
+          },
+          {
+            path: '/list/search/projects',
+            name: 'projects',
+            component: './List/Projects',
+          },
+          {
+            path: '/list/search/applications',
+            name: 'applications',
+            component: './List/Applications',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    icon: 'profile',
+    routes: [
+      // profile
+      {
+        path: '/profile/basic',
+        name: 'basic',
+        component: './Profile/BasicProfile',
+      },
+      {
+        path: '/profile/basic/:id',
+        name: 'basic',
+        hideInMenu: true,
+        component: './Profile/BasicProfile',
+      },
+      {
+        path: '/profile/advanced',
+        name: 'advanced',
+        authority: ['admin'],
+        component: './Profile/AdvancedProfile',
+      },
+    ],
+  },
+  {
+    name: 'result',
+    icon: 'check-circle-o',
+    path: '/result',
+    routes: [
+      // result
+      {
+        path: '/result/success',
+        name: 'success',
+        // component: './Result/Success',
+      },
+      // { path: '/result/fail', name: 'fail', component: './Result/Error' },
+    ],
+  },
+  {
+    name: 'exception',
+    icon: 'warning',
+    path: '/exception',
+    routes: [
+      // exception
+      {
+        path: '/exception/403',
+        name: 'not-permission',
+        component: './Exception/403',
+      },
+      {
+        path: '/exception/404',
+        name: 'not-find',
+        component: './Exception/404',
+      },
+      {
+        path: '/exception/500',
+        name: 'server-error',
+        component: './Exception/500',
+      },
+      {
+        path: '/exception/trigger',
+        name: 'trigger',
+        hideInMenu: true,
+        component: './Exception/TriggerException',
+      },
+    ],
+  },
+  {
+    name: 'account',
+    icon: 'user',
+    path: '/account',
+    routes: [
+      {
+        path: '/account/center',
+        name: 'center',
+        component: './Account/Center/Center',
+        routes: [
+          {
+            path: '/account/center',
+            redirect: '/account/center/articles',
+          },
+          {
+            path: '/account/center/articles',
+            component: './Account/Center/Articles',
+          },
+          {
+            path: '/account/center/applications',
+            component: './Account/Center/Applications',
+          },
+          {
+            path: '/account/center/projects',
+            component: './Account/Center/Projects',
+          },
+        ],
+      },
+      {
+        path: '/account/settings',
+        name: 'settings',
+        component: './Account/Settings/Info',
+        routes: [
+          {
+            path: '/account/settings',
+            redirect: '/account/settings/base',
+          },
+          {
+            path: '/account/settings/base',
+            component: './Account/Settings/BaseView',
+          },
+          {
+            path: '/account/settings/security',
+            component: './Account/Settings/SecurityView',
+          },
+          {
+            path: '/account/settings/binding',
+            component: './Account/Settings/BindingView',
+          },
+          {
+            path: '/account/settings/notification',
+            component: './Account/Settings/NotificationView',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    component: '404',
+  }
 ];
 
 export default {
