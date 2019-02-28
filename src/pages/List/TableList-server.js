@@ -24,6 +24,7 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
 import styles from './TableList.less';
 
 const FormItem = Form.Item;
@@ -65,7 +66,6 @@ const CreateForm = Form.create()(props => {
 });
 
 @Form.create()
-
 class UpdateForm extends PureComponent {
   static defaultProps = {
     handleUpdate: () => {},
@@ -274,9 +274,8 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ plan,rule, loading }) => ({
+@connect(({ rule, loading }) => ({
   rule,
-  plan,
   loading: loading.models.rule,
 }))
 @Form.create()
@@ -353,22 +352,12 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
-
     dispatch({
       type: 'rule/fetch',
+      params:{
+
+      }
     });
-
-    dispatch({
-      type:'plan/fetch',
-      payload:{
-        params:{
-          source:0,
-          status:1,
-          group:0
-        }
-      },
-    })
-
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {

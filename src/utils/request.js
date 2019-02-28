@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
+import qs from 'qs'
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -87,6 +88,7 @@ export default function request(url, option) {
     newOptions.method === 'PUT' ||
     newOptions.method === 'DELETE'
   ) {
+
     if (!(newOptions.body instanceof FormData)) {
       newOptions.headers = {
         Accept: 'application/json',
@@ -94,12 +96,14 @@ export default function request(url, option) {
         ...newOptions.headers,
       };
       newOptions.body = JSON.stringify(newOptions.body);
-    } else {
+    } else  {
       // newOptions.body is FormData
       newOptions.headers = {
         Accept: 'application/json',
+        // 'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
         ...newOptions.headers,
       };
+      // newOptions.body = qs.stringify(newOptions.body);
     }
   }
 

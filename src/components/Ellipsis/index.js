@@ -13,6 +13,17 @@ const TooltipOverlayStyle = {
   wordWrap: 'break-word',
 };
 
+/*
+* charCodeAt 返回指定位置的字符的Unicode编码。这个返回值是0-65535之间的整数
+* Unicode前128个字符 是对应的ASCII码
+* reduce(callback,initialValue);
+* callback(执行数组中每个值的函数，包含四个参数)
+*   preValue -> 上一次调用回调返回的值，或者是提供的初始值（initialValue）
+*   curValue -> 数组中当前被处理的元素
+*   index -> 当前元素在数组中的索引
+*   array (调用reduce的数组)
+* initialValue -> 作为第一次调用callback的第一个参数
+* */
 export const getStrFullLength = (str = '') =>
   str.split('').reduce((pre, cur) => {
     const charCode = cur.charCodeAt(0);

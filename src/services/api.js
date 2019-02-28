@@ -1,6 +1,16 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
+const formmaterParams = params =>{
+  if(Object.prototype.toString.call(params)=='[object Object]'){
+    let paramsStr = '';
+    for(item in params){
+      paramsStr += item+'='+params[item]+'&';
+    }
+    return paramsStr.substr(0,paramsStr.length-1)
+  }
+}
+
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
@@ -46,7 +56,10 @@ export async function updateRule(params = {}) {
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
     method: 'POST',
-    body: params,
+    body: {
+      ...params,
+      method:'post',
+    },
   });
 }
 
@@ -129,3 +142,31 @@ export async function getFakeCaptcha(mobile) {
 export async function getMockMenu() {
   return request('/api/menu');
 }
+
+
+// 获取iot测试环境data
+
+/*
+* 登录接口
+* */
+
+export async  function iotLogin(params) {
+  let paramFormData = new FormData();
+  paramFormData.append('data',JSON.stringify(params));
+  return request('/iot/users/login',{
+    method:'POST',
+    body:paramFormData
+  })
+}
+
+/*
+* 获取套餐接口
+* */
+export async function planList(params) {
+  console.log(params);
+  return request(`/iot/v1/plans?${stringify(params.params)}`);
+}
+
+
+
+

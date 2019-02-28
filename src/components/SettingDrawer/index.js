@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { Select, message, Drawer, List, Switch, Divider, Icon, Button, Alert, Tooltip } from 'antd';
-// import { formatMessage } from 'umi/locale';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
 import omit from 'omit.js';
@@ -161,7 +160,7 @@ class SettingDrawer extends PureComponent {
         }}
       >
         <div className={styles.content}>
-          <Body title={'整体风格设置'}>
+          <Body title='整体风格设置'>
           {/*<Body title={formatMessage({ id: 'app.setting.pagestyle' })}>*/}
             <BlockCheckbox
               list={[
@@ -184,7 +183,7 @@ class SettingDrawer extends PureComponent {
           </Body>
 
           <ThemeColor
-            title={'主题色'}
+            title='主题色'
             // title={formatMessage({ id: 'app.setting.themecolor' })}
             value={primaryColor}
             onChange={color => this.changeSetting('primaryColor', color)}
@@ -192,7 +191,7 @@ class SettingDrawer extends PureComponent {
 
           <Divider />
 
-          <Body title={'导航模式'}>
+          <Body title='导航模式'>
           {/*<Body title={formatMessage({ id: 'app.setting.navigationmode' })}>*/}
             <BlockCheckbox
               list={[
@@ -244,7 +243,7 @@ class SettingDrawer extends PureComponent {
             // onCopy={() => message.success(formatMessage({ id: 'app.setting.copyinfo' }))}
           >
             <Button block icon="copy">
-              {'拷贝设置'}
+              拷贝设置
               {/*{formatMessage({ id: 'app.setting.copy' })}*/}
             </Button>
           </CopyToClipboard>
@@ -253,7 +252,7 @@ class SettingDrawer extends PureComponent {
             className={styles.productionHint}
             message={
               <div>
-                {'配置栏只在开发环境用于预览，生产环境不会展现，请拷贝后手动修改配置文件'}{' '}
+                配置栏只在开发环境用于预览，生产环境不会展现，请拷贝后手动修改配置文件
                 {/*{formatMessage({ id: 'app.setting.production.hint' })}{' '}*/}
                 <a
                   href="https://u.ant.design/pro-v2-default-settings"

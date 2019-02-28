@@ -41,10 +41,12 @@ class LoginPage extends Component {
 
   handleSubmit = (err, values) => {
     const { type } = this.state;
+    console.log(values);
     if (!err) {
       const { dispatch } = this.props;
       dispatch({
         type: 'login/login',
+        // payload:formdata
         payload: {
           ...values,
           type,
@@ -82,7 +84,7 @@ class LoginPage extends Component {
               !submitting &&
               this.renderMessage('账户或密码错误（admin/ant.design）')}
             <UserName
-              name="userName"
+              name="username"
               placeholder="登录名: admin or user"
               rules={[
                 {

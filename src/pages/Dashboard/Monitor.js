@@ -5,6 +5,7 @@ import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import { getTimeDistance } from '@/utils/utils';
 import styles from './Analysis.less';
 import PageLoading from '@/components/PageLoading';
+import monitor from "./models/monitor";
 // import { AsyncLoadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
 
 // const IntroduceRow = React.lazy(() => import('./IntroduceRow'));
@@ -130,60 +131,13 @@ class Analysis extends Component {
     const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
 
     return (
-      <GridContent>
-        <Suspense fallback={<PageLoading />}>
-          {/*<IntroduceRow loading={loading} visitData={visitData} />*/}
-        </Suspense>
-        <Suspense fallback={null}>
-          {/*<SalesCard*/}
-          {/*rangePickerValue={rangePickerValue}*/}
-          {/*salesData={salesData}*/}
-          {/*isActive={this.isActive}*/}
-          {/*handleRangePickerChange={this.handleRangePickerChange}*/}
-          {/*loading={loading}*/}
-          {/*selectDate={this.selectDate}*/}
-          {/*/>*/}
-        </Suspense>
-        <div className={styles.twoColLayout}>
-          <Row gutter={24}>
-            <Col xl={12} lg={24} md={24} sm={24} xs={24}>
-              <Suspense fallback={null}>
-                {/*<TopSearch*/}
-                {/*loading={loading}*/}
-                {/*visitData2={visitData2}*/}
-                {/*selectDate={this.selectDate}*/}
-                {/*searchData={searchData}*/}
-                {/*dropdownGroup={dropdownGroup}*/}
-                {/*/>*/}
-              </Suspense>
-            </Col>
-            <Col xl={12} lg={24} md={24} sm={24} xs={24}>
-              <Suspense fallback={null}>
-                {/*<ProportionSales*/}
-                {/*dropdownGroup={dropdownGroup}*/}
-                {/*salesType={salesType}*/}
-                {/*loading={loading}*/}
-                {/*salesPieData={salesPieData}*/}
-                {/*handleChangeSalesType={this.handleChangeSalesType}*/}
-                {/*/>*/}
-              </Suspense>
-            </Col>
-          </Row>
-        </div>
-        <Suspense fallback={null}>
-          {/*<OfflineData*/}
-          {/*activeKey={activeKey}*/}
-          {/*loading={loading}*/}
-          {/*offlineData={offlineData}*/}
-          {/*offlineChartData={offlineChartData}*/}
-          {/*handleTabChange={this.handleTabChange}*/}
-          {/*/>*/}
-        </Suspense>
-      </GridContent>
+      <div></div>
     );
   }
 }
 
-export default props => ({
-  ...props
-});
+// export default props => ({
+//   ...props
+// });
+
+export default Analysis
