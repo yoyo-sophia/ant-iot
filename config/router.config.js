@@ -41,7 +41,29 @@ export default [
             component: './Dashboard/Workplace',
           },
         ],
-      },
+      },{
+        path:'/authority',
+        name:'系统设置',
+        icon:'form',
+        routes:[
+          {
+            path:'/authority/node_setting',
+            name:'节点设置',
+            component:'./Authority/node_setting'
+          },{
+            path:'/authority/role_setting',
+            name:'角色设置',
+            component:'./Authority/role_setting'
+          },{
+            path:'/authority/account_setting',
+            name:'账号设置',
+            component:'./Authority/account_setting'
+          }
+        ]
+
+      },//权限节点
+
+
       // forms
       // {
       //   path: '/form',
