@@ -1,4 +1,4 @@
-import { getAccountList } from '@/services/api';
+import { getAccountList,getAccountDetail } from '@/services/api';
 
 export default {
   namespace:'authority',
@@ -7,6 +7,11 @@ export default {
       list: [],
       pagination: {},
     },
+    accountDetailData:{
+        list: [],
+        pagination: {},
+
+    }
   },
   effects:{
     *fetch({ payload }, { call, put }) {
@@ -16,12 +21,20 @@ export default {
         payload: response,
       });
     },
+    *fetch_account_detail({payload},{call,put}){
+      const response = yield call(getAccountDetail,payload);
+      yield put({
+        type:'save',
+        payload:response,
+      })
+    },
   },
   reducers:{
     save(state, action) {
       return {
         ...state,
         data: action.payload,
+        accountDetailData:action.payload,
       };
     },
   }

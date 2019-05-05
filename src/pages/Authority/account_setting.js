@@ -3,18 +3,16 @@ import { connect } from "dva";
 import { Row, Col, Tree, Card, Form, Input, Button ,Divider, Checkbox,Modal} from "antd";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
 import StandardTable from '@/components/StandardTable';
+import router from 'umi/router';
 
 const FormItem = Form.Item;
 
+// 分配角色权限
 const CreateForm = Form.create()((props) => {
   const { modalVisible, form, handleAdd, handleModalVisible ,roleLists, roleInitialLists} = props;
-  // const { roleLists , roleInitialLists } = this.state;
 
   const okHandle = () => {
     form.validateFields((err, fieldValue) => {
-
-
-
       if (err) return;
       // form.resetFields();
       handleAdd(fieldValue);
@@ -110,17 +108,20 @@ class account_setting extends Component {
       title: '手机号码',
       dataIndex: 'phone',
     }, {
+      title: '账号状态',
+      dataIndex: 'status',
+      render: (text, record) => (
+        <Button type={ record.status === 0 ? 'primary':'' }>{record.status === 0 ? '关闭':'开启'}</Button>
+      )
+    }
+    ,{
       // dataIndex:'operate',
       title: "操作",
       render: (text, record) => (
         <Fragment>
-          <a onClick={()=>this.handleRoles(true)}>分配权限</a>
+          <a onClick={()=>this.handleRoles(true)}>编辑</a>
           <Divider type="vertical"/>
-          <a onClick={()=>this.editAuthority(true,record)}>编辑</a>
-          <Divider type="vertical"/>
-          <a onClick={()=>this.deleteUser}>移除</a>
-          <Divider type="vertical"/>
-          <a onClick={()=>this.checkUserRole}>查看</a>
+          <a onClick={()=>this.checkUserRole(record.id)}>查看账号权限</a>
         </Fragment>
       )
     }
@@ -136,16 +137,6 @@ class account_setting extends Component {
     this.setState({
       modalVisible: !!flag
     })
-  };
-
-  // 编辑权限
-  editAuthority = () =>{
-
-  };
-
-  // 移除用户
-  deleteUser = () =>{
-
   };
 
   renderAllRoles = (data) =>{
@@ -192,8 +183,9 @@ class account_setting extends Component {
 
 
   // 查看用户详细功能
-  checkUserRole = () =>{
-
+  checkUserRole = (id) =>{
+    localStorage.setItem('accountAuthorityDetail',id);
+    router.push('/authority/account_detail')
   };
 
   // 控制弹窗显示隐藏

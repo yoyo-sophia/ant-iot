@@ -156,7 +156,6 @@ export async function planList(params) {
   return request(`/iot/v1/plans?${stringify(params.params)}`);
 }
 
-
 /*
 * 卡详情
 * */
@@ -164,8 +163,17 @@ export async function cardList() {
   return request(`/iot/v1/cards/new_list`);
 }
 
+// 账号列表
 
 export async function getAccountList() {
   return request('/api/account/list');
+}
+
+// 账号权限详情列表
+
+export async function getAccountDetail(params) {
+  return request(`/api/account/detail?${stringify({
+    id:params.id
+  })}`);
 }
 

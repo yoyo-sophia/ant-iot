@@ -58,6 +58,10 @@ export default [
             path:'/authority/account_setting',
             name:'账号设置',
             component:'./Authority/account_setting'
+          },{
+            path:'/authority/account_detail',
+            name:'账号权限详情',
+            component:'./Authority/account_detail'
           }
         ]
 
