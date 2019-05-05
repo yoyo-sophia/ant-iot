@@ -29,12 +29,12 @@ export default {
       })
     },
   },
-  reducers:{
+  reducers: {
     save(state, action) {
       return {
         ...state,
         data: action.payload,
-        accountDetailData:action.payload,
+        accountDetailData: action.payload,
       };
     },
   }

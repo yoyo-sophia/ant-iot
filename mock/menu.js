@@ -5,14 +5,17 @@ const mock_menu = [
     icon: "dashboard",
     authority: ["admin", "user"],
     children: [{
+      // authority: undefined,
       exact: true,
       name: "分析页",
       path: "/dashboard/analysis"
     }, {
+      // authority: undefined,
       exact: true,
       name: "监控页",
       path: "/dashboard/monitor"
     }, {
+      // authority: undefined,
       exact: true,
       name: "工作台",
       path: "/dashboard/workplace"
@@ -38,17 +41,48 @@ const mock_menu = [
     ]
 
   }, {
-    path: "/cards",
-    name: "卡管理",
+    path: "/form",
     icon: "form",
+    name: "表单",
     routes: [
       {
-        path: "/cards/index",
-        name: "卡详情",
-        component: "./cards/list"
+        path: "/form/basic-form",
+        name: "基础表单"
+      },
+      {
+        path: "/form/step-form",
+        name: "分步表单",
+        // hideChildrenInMenu: true,
+        children: [
+          {
+            path: "/form/step-form",
+            redirect: "/form/step-form/info"
+          },
+          {
+            path: "/form/step-form/info",
+            name: "info",
+            component: "./Forms/StepForm/Step1"
+          },
+          {
+            path: "/form/step-form/confirm",
+            name: "confirm",
+            component: "./Forms/StepForm/Step2"
+          },
+          {
+            path: "/form/step-form/result",
+            name: "result",
+            component: "./Forms/StepForm/Step3"
+          }
+        ]
+      },
+      {
+        path: "/form/advanced-form",
+        name: "高级表单",
+        authority: ["admin"]
       }
     ]
-  }, {
+  },
+  {
     path: "/list",
     icon: "table",
     name: "list",
@@ -95,7 +129,76 @@ const mock_menu = [
         ]
       }
     ]
-  }, {
+  },
+  {
+    path: "/profile",
+    name: "profile",
+    icon: "profile",
+    routes: [
+      // profile
+      {
+        path: "/profile/basic",
+        name: "basic",
+        component: "./Profile/BasicProfile"
+      },
+      {
+        path: "/profile/basic/:id",
+        name: "basic",
+        hideInMenu: true,
+        component: "./Profile/BasicProfile"
+      },
+      {
+        path: "/profile/advanced",
+        name: "advanced",
+        authority: ["admin"],
+        component: "./Profile/AdvancedProfile"
+      }
+    ]
+  },
+  {
+    name: "result",
+    icon: "check-circle-o",
+    path: "/result",
+    routes: [
+      // result
+      {
+        path: "/result/success",
+        name: "success"
+        // component: './Result/Success',
+      }
+      // { path: '/result/fail', name: 'fail', component: './Result/Error' },
+    ]
+  },
+  {
+    name: "exception",
+    icon: "warning",
+    path: "/exception",
+    routes: [
+      // exception
+      {
+        path: "/exception/403",
+        name: "not-permission",
+        component: "./Exception/403"
+      },
+      {
+        path: "/exception/404",
+        name: "not-find",
+        component: "./Exception/404"
+      },
+      {
+        path: "/exception/500",
+        name: "server-error",
+        component: "./Exception/500"
+      },
+      {
+        path: "/exception/trigger",
+        name: "trigger",
+        hideInMenu: true,
+        component: "./Exception/TriggerException"
+      }
+    ]
+  },
+  {
     name: "account",
     icon: "user",
     path: "/account",
@@ -151,7 +254,8 @@ const mock_menu = [
         ]
       }
     ]
-  }, {
+  },
+  {
     component: "404"
   }
 ];

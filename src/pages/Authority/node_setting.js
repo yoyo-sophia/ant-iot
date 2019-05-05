@@ -22,6 +22,7 @@ class node_setting extends Component {
     node_radio_data:{
       menu:1,
       role:1,
+      status:1
     },
     newMenuList:[],
   };
@@ -153,7 +154,6 @@ class node_setting extends Component {
         sm: { span: 20 },
       },
     };
-
     const tailFormItemLayout = {
       wrapperCol: {
         xs: {
@@ -176,6 +176,8 @@ class node_setting extends Component {
     const deleteNode = () => {
 
     };
+
+
 
     return (
       <PageHeaderWrapper title="节点设置">
