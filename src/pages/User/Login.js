@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-// import { formatMessage, FormattedMessage } from 'umi/locale';
 import Link from 'umi/link';
-import { Checkbox, Alert, Icon } from 'antd';
+import { Checkbox, Alert, Icon ,Form} from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
@@ -18,26 +17,22 @@ class LoginPage extends Component {
     autoLogin: true,
   };
 
-  onTabChange = type => {
-    this.setState({ type });
-  };
-
-  onGetCaptcha = () =>
-    new Promise((resolve, reject) => {
-      this.loginForm.validateFields(['mobile'], {}, (err, values) => {
-        if (err) {
-          reject(err);
-        } else {
-          const { dispatch } = this.props;
-          dispatch({
-            type: 'login/getCaptcha',
-            payload: values.mobile,
-          })
-            .then(resolve)
-            .catch(reject);
-        }
-      });
-    });
+  // onGetCaptcha = () =>
+  //   new Promise((resolve, reject) => {
+  //     this.loginForm.validateFields(['mobile'], {}, (err, values) => {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         const { dispatch } = this.props;
+  //         dispatch({
+  //           type: 'login/getCaptcha',
+  //           payload: values.mobile,
+  //         })
+  //           .then(resolve)
+  //           .catch(reject);
+  //       }
+  //     });
+  //   }); // 获取验证码
 
   handleSubmit = (err, values) => {
     const { type } = this.state;
@@ -103,42 +98,6 @@ class LoginPage extends Component {
                 },
               ]}
               onPressEnter={() => this.loginForm.validateFields(this.handleSubmit)}
-            />
-          </Tab>
-          <Tab key="mobile" tab="手机号登录">
-            {login.status === 'error' &&
-              login.type === 'mobile' &&
-              !submitting &&
-              this.renderMessage(
-                formatMessage("验证码错误")
-              )}
-            <Mobile
-              name="mobile"
-              placeholder="手机号"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入手机号",
-                },
-                {
-                  pattern: /^1\d{10}$/,
-                  message: "手机号码错误",
-                },
-              ]}
-            />
-            <Captcha
-              name="captcha"
-              placeholder="请输入验证码"
-              countDown={120}
-              onGetCaptcha={this.onGetCaptcha}
-              getCaptchaButtonText="获取验证码"
-              getCaptchaSecondText="秒"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入验证码",
-                },
-              ]}
             />
           </Tab>
           <div>

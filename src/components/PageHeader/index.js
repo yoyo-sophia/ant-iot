@@ -48,12 +48,12 @@ export default class PageHeader extends PureComponent {
             paragraph={{ rows: 3 }}
             avatar={{ size: 'large', shape: 'circle' }}
           >
-            {hiddenBreadcrumb ? null : <BreadcrumbView {...this.props} />}
+            {/*{hiddenBreadcrumb ? null : <BreadcrumbView {...this.props} />}*/}
             <div className={styles.detail}>
               {logo && <div className={styles.logo}>{logo}</div>}
               <div className={styles.main}>
                 <div className={styles.row}>
-                  {title && <h1 className={styles.title}>{title}</h1>}
+                  {title && <p className={styles.title}>{title}</p>}
                   {action && <div className={styles.action}>{action}</div>}
                 </div>
                 <div className={styles.row}>

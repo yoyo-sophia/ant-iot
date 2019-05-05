@@ -62,6 +62,18 @@ export default [
         ]
 
       },//权限节点
+      {
+        path:'/cards',
+        name:'卡管理',
+        icon: "form",
+        routes:[
+          {
+            path:'/cards/index',
+            name:'卡详情',
+            component: './cards/list'
+          }
+        ]
+      },
 
 
       // forms

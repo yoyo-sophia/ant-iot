@@ -1,16 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-const formmaterParams = params =>{
-  if(Object.prototype.toString.call(params)=='[object Object]'){
-    let paramsStr = '';
-    for(item in params){
-      paramsStr += item+'='+params[item]+'&';
-    }
-    return paramsStr.substr(0,paramsStr.length-1)
-  }
-}
-
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
@@ -163,10 +153,19 @@ export async  function iotLogin(params) {
 * 获取套餐接口
 * */
 export async function planList(params) {
-  console.log(params);
   return request(`/iot/v1/plans?${stringify(params.params)}`);
 }
 
 
+/*
+* 卡详情
+* */
+export async function cardList() {
+  return request(`/iot/v1/cards/new_list`);
+}
 
+
+export async function getAccountList() {
+  return request('/api/account/list');
+}
 
