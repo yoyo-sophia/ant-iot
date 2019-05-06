@@ -167,7 +167,6 @@ export async function planList(params) {
   return request(`/iot/v1/plans?${stringify(params.params)}`);
 }
 
-<<<<<<< HEAD
 /*
 * 卡详情
 * */
@@ -176,10 +175,6 @@ export async function cardList() {
 }
 
 // 账号列表
-=======
-
->>>>>>> parent of 094e2fa... 账号设置
-
 
 // 账号权限详情列表
 
