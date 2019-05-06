@@ -26,7 +26,7 @@ class account_detail extends Component {
     {
       title: "拥有权限",
       dataIndex: "authorities"
-  }];
+    }];
 
   componentDidMount() {
     const { dispatch } = this.props;

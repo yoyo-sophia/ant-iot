@@ -109,7 +109,7 @@ class node_setting extends Component {
     this.state.newMenuList
       .map(item=>{
         if(selectedKeys[0]==item.path){
-            choose_menu_data = item
+          choose_menu_data = item
         }
       })
 
@@ -258,7 +258,7 @@ class node_setting extends Component {
                     initialValue:this.state.node_radio_data.menu
                   })(
                     <Radio.Group>
-                    {/*<Radio.Group defaultValue={this.state.node_radio_data.menu}>*/}
+                      {/*<Radio.Group defaultValue={this.state.node_radio_data.menu}>*/}
                       <Radio value={1}>是</Radio>
                       <Radio value={2}>否</Radio>
                     </Radio.Group>
@@ -270,7 +270,7 @@ class node_setting extends Component {
                     initialValue:this.state.node_radio_data.role
                   })(
                     <Radio.Group>
-                    {/*<Radio.Group defaultValue={this.state.node_radio_data.role}>*/}
+                      {/*<Radio.Group defaultValue={this.state.node_radio_data.role}>*/}
                       <Radio value={1}>主节点</Radio>
                       <Radio value={2}>子节点</Radio>
                     </Radio.Group>
@@ -282,7 +282,7 @@ class node_setting extends Component {
                     initialValue:this.state.node_radio_data.status
                   })(
                     <Radio.Group>
-                    {/*<Radio.Group defaultValue={this.state.node_radio_data.status}>*/}
+                      {/*<Radio.Group defaultValue={this.state.node_radio_data.status}>*/}
                       <Radio value={1}>开启</Radio>
                       <Radio value={2}>关闭</Radio>
                     </Radio.Group>

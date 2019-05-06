@@ -176,6 +176,10 @@ export async function cardList() {
 
 // 账号列表
 
+export async function getAccountList() {
+  return request('/api/account/list');
+}
+
 // 账号权限详情列表
 
 export async function getAccountDetail(params) {
