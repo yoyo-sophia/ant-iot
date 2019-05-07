@@ -1,4 +1,4 @@
-import React, {Component, PureComponent, Fragment } from "react";
+import React, { Component, PureComponent, Fragment } from "react";
 import { connect } from "dva";
 import router from "umi/router";
 import {
@@ -12,7 +12,7 @@ import {
   Divider,
   Button,
   message,
-  Tree,
+  Tree
 } from "antd";
 
 import StandardTable from "@/components/StandardTable";
@@ -26,7 +26,7 @@ const confirm = Modal.confirm;
 
 // 新增或编辑角色
 const ManipulationRole = Form.create()((props) => {
-  const { modalVisible, form, handleAdd, handleModalVisible ,editRoleData} = props;
+  const { modalVisible, form, handleAdd, handleModalVisible, editRoleData } = props;
   const okHandle = () => {
     form.validateFields((err, fieldValue) => {
       if (err) return;
@@ -34,56 +34,144 @@ const ManipulationRole = Form.create()((props) => {
       handleAdd(fieldValue);
     });
   };
-  return(
+  return (
     <Modal
-      title={editRoleData.isEdit===1?'编辑角色':'创建角色'}
+      title={editRoleData.isEdit === 1 ? "编辑角色" : "创建角色"}
       visible={modalVisible}
       onOk={okHandle}
-      onCancel={()=>handleModalVisible()}
+      onCancel={() => handleModalVisible()}
     >
       <FormItem labelCol={{ span: 6 }} wrapperCol={{ span: 15 }} label="角色名称">
-        {form.getFieldDecorator('name', {
-          initialValue:editRoleData.name,
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-        })(<Input placeholder="请输入角色名称" />)}
+        {form.getFieldDecorator("name", {
+          initialValue: editRoleData.name,
+          rules: [{ required: true, message: "请输入至少五个字符的规则描述！", min: 5 }]
+        })(<Input placeholder="请输入角色名称"/>)}
       </FormItem>
 
       <FormItem labelCol={{ span: 6 }} wrapperCol={{ span: 15 }} label="角色描述">
-        {form.getFieldDecorator('describe', {
-          initialValue:editRoleData.describe,
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
-        })(<Input placeholder="请输入角色描述" />)}
+        {form.getFieldDecorator("describe", {
+          initialValue: editRoleData.describe,
+          rules: [{ required: true, message: "请输入至少五个字符的规则描述！", min: 5 }]
+        })(<Input placeholder="请输入角色描述"/>)}
       </FormItem>
 
     </Modal>
-  )
+  );
 });
 
+// 分配权限
+const DispatchAuthority = (props) => {
+  const state = {
+    checkedKeys: [],
+    expandedKeys: [],
+    selectedKeys: [],
+  };
+
+  const {
+    menuData,
+    showAuthorityModal,
+    selectKeys,
+    confirmDispatchAuthority,
+    hideDispatchAuthorityModal
+  } = props;
+
+  // 循环创建菜单权限列表
+  const getNavMenuItems = (menusData, parent) => {
+    if (!menusData) {
+      return [];
+    }
+    return menusData
+      .filter(item => item.name)
+      .map(item => getSubMenuOrItem(item, parent))
+      .filter(item => item);
+  };
+
+  const getSubMenuOrItem = item => {
+    // doc: add hideChildrenInMenu
+    if (item.children && item.children.some(child => child.name)) {
+      return (
+        <TreeNode
+          title={item.name}
+          key={item.path}>
+          {getNavMenuItems(item.children)}
+        </TreeNode>
+      );
+    }
+    return <TreeNode title={item.name} key={item.path} isLeaf/>;
+  };
+
+  // 权限分配相关操作
+  const onExpand = (expandedKeys,e) => {
+    console.log("onExpand", expandedKeys);
+    console.log(e);
+
+  };
+
+  const onCheck = (checkedKeys,e) => {
+    console.log("onCheck", checkedKeys);
+    console.log(e);
+    state.checkedKeys = checkedKeys;
+  };
+
+  const onSelect = (selectedKeys, info) => {
+    console.log("onSelect", info);
+  };
+
+  const submitAuthoritySetting = () =>{
+
+    // hideDispatchAuthorityModal(false);
+  }
+
+  return (
+    <Modal
+      visible={showAuthorityModal}
+      title="分配权限"
+      onOk={submitAuthoritySetting}
+      onCancel={() => hideDispatchAuthorityModal(false)}
+    >
+      <Tree
+        checkable
+        onExpand={onExpand}
+        onCheck={onCheck}
+        selectkeys={selectKeys}
+        onSelect={onSelect}
+        selectable={false}
+      >
+        {getNavMenuItems(menuData)}
+      </Tree>
+    </Modal>
+  );
+
+};
 
 
-@connect(({ menu: menuModel,authority, loading }) => ({
+@connect(({ menu: menuModel, authority, loading }) => ({
   menuData: menuModel.menuData,
   authority,
-  loading: loading.models.authority,
+  loading: loading.models.authority
 }))
 
 
 class roleSetting extends Component {
   state = {
+    /*
+    * 角色编辑相关参数
+    * */
     modalVisible: false,
-    updateModalVisible: false,
     selectedRows: [],
     formValues: {},
     // 编辑权限相关参数
     editRoleModal: false,
-    editRoleData:{
-      name:'',
-      describe:'',
-      isEdit:1,
+    editRoleData: {
+      name: "",
+      describe: "",
+      isEdit: 1
     },
-    checkedKeys: ['0-0-0'],
-    expandedKeys: [],
-    selectedKeys: [],
+    /*
+    * 权限分配相关参数
+    * */
+    showAuthorityModal: false,
+    defaultSelectedKeys:{},
   };
 
   columns = [
@@ -104,11 +192,11 @@ class roleSetting extends Component {
       title: "操作",
       render: (text, record) => (
         <Fragment>
-          <a onClick={()=>this.handleEditModal(true)}>分配权限</a>
+          <a onClick={() => this.showAuthorityModal(true)}>分配权限</a>
           <Divider type="vertical"/>
-          <a onClick={()=>this.handleModalVisible(true,record,1)}>编辑</a>
+          <a onClick={() => this.handleModalVisible(true, record, 1)}>编辑</a>
           <Divider type="vertical"/>
-          <a onClick={()=>this.removeRole(record)}>移除</a>
+          <a onClick={() => this.removeRole(record)}>移除</a>
           <Divider type="vertical"/>
           <a onClick={() => this.checkRolePartnerDetail(record.id)}>查看</a>
         </Fragment>
@@ -119,7 +207,7 @@ class roleSetting extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'authority/fetch_role_list',
+      type: "authority/fetch_role_list"
     });
   }
 
@@ -128,26 +216,31 @@ class roleSetting extends Component {
   * */
 
   // 分配权限Modal
+  showAuthorityModal = (flag) => {
+    this.setState({
+      showAuthorityModal: !!flag
+    });
+  };
 
   // 移除角色
-  removeRole = (params) =>{
-    const { authority:{deleteRole}, dispatch,} = this.props;
+  removeRole = (params) => {
+    const { authority: { deleteRole }, dispatch } = this.props;
     confirm({
-      title:'操作',
+      title: "操作",
       content: `是否移除此'${params.name}'这个角色？`,
-      okText: '确认',
-      cancelText: '取消',
-      onOk(){
+      okText: "确认",
+      cancelText: "取消",
+      onOk() {
 
         dispatch({
-          type:'authority/delete_role',
-          payload:{
-            id:params.id
+          type: "authority/delete_role",
+          payload: {
+            id: params.id
           },
-          callback:(res)=>{
+          callback: (res) => {
             console.log(res);
           }
-        })
+        });
 
         // return new Promise((resolve, reject) =>{
         //   console.log(curDeleteRole);
@@ -160,64 +253,20 @@ class roleSetting extends Component {
         //   }
         // });
       },
-      onCancel(){},
-    })
+      onCancel() {
+      }
+    });
   };
 
   // 查看详情
-  checkRolePartnerDetail = (id) =>{
-    localStorage.setItem('rolePartnerDetailId',id);
+  checkRolePartnerDetail = (id) => {
+    localStorage.setItem("rolePartnerDetailId", id);
     router.push("/authority/role_detail");
   };
 
-  // 循环创建菜单权限列表
-  getNavMenuItems = (menusData, parent) => {
-    if (!menusData) {
-      return [];
-    }
-    return menusData
-      .filter(item => item.name)
-      .map(item => this.getSubMenuOrItem(item, parent))
-      .filter(item => item);
-  };
-  getSubMenuOrItem = item => {
-    // doc: add hideChildrenInMenu
-    if (item.children && item.children.some(child => child.name)) {
-      return (
-        <TreeNode
-          title={item.name}
-          key={item.path}>
-          {this.getNavMenuItems(item.children)}
-        </TreeNode>
-      );
-    }
-    return <TreeNode title={item.name} key={item.path} isLeaf/>;
-  };
-
-  // 权限分配相关操作
-  onExpand = (expandedKeys) => {
-    console.log('onExpand', expandedKeys);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
-    this.setState({
-      expandedKeys,
-      autoExpandParent: false,
-    });
-  }
-
-  onCheck = (checkedKeys) => {
-    console.log('onCheck', checkedKeys);
-    this.setState({ checkedKeys });
-  }
-
-  onSelect = (selectedKeys, info) => {
-    console.log('onSelect', info);
-    this.setState({ selectedKeys });
-  }
-
   // 重置表单
   handleFormRest = () => {
-    const {form ,dispatch } = this.props;
+    const { form, dispatch } = this.props;
 
     form.resetFields();
 
@@ -261,34 +310,27 @@ class roleSetting extends Component {
   * data 需要修改的数据
   * isEdit 当前为修改数据还是新增数据
   * */
-  handleModalVisible = (flag,data,isEdit) => {
-
-    if(flag && data){
+  handleModalVisible = (flag, data, isEdit) => {
+    if (flag && data) {
       this.setState({
-        editRoleData:{
-          ...data,
-          isEdit:1,
-        }
-      })
-    }else{
+        editRoleData: { ...data, isEdit: 1 }
+      });
+    } else {
       this.setState({
-        editRoleData:{
-          name:'',
-          describe:'',
-          isEdit:0,
-        },
-      })
+        editRoleData: { name: "", describe: "", isEdit: 0 }
+      });
     }
     this.setState({
       modalVisible: !!flag
     });
   };
 
-  handleEditModal = flag =>{
+  // 编辑弹窗 控制
+  handleEditModal = flag => {
     this.setState({
       editRoleModal: !!flag
-    })
-  }
+    });
+  };
 
   handleAdd = fields => {
     const { dispatch } = this.props;
@@ -302,63 +344,35 @@ class roleSetting extends Component {
     this.handleModalVisible();
   };
 
-  // 分配权限Modal
-  handleEditRole = ()=>{
-    message.success("编辑权限成功");
-    this.handleEditModal();
-  }
-  // 渲染菜单列表
-  RenderRoleList(methods){
-    const {editRoleModal } = this.state;
-    const {menuData} = this.props;
-
-    return (
-      <Modal
-        visible={editRoleModal}
-        destroyOnClose
-        title="分配权限"
-        onOk={this.handleEditRole}
-        onCancel={methods.handleEditModal}
-      >
-        <Tree
-          checkable
-          onExpand={this.onExpand}
-          onCheck={this.onCheck}
-          selectkeys={this.state.selectedKeys}
-          onSelect={this.onSelect}
-        >
-          {this.getNavMenuItems(menuData)}
-        </Tree>
-      </Modal>
-    )
-  }
-
   render() {
     const {
       authority: { roleData },
       loading,
-      menuData,
+      menuData
     } = this.props;
 
-    const { selectedRows, modalVisible, editRoleModal , updateModalVisible, setFormValues } = this.state;
+    const { modalVisible, editRoleModal, selectedKeys } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
-      editRoleData : this.state.editRoleData
-
+      editRoleData: this.state.editRoleData
     };
 
-    const editRoleMethods = {
-      handleEditModal : this.handleEditModal,
-
-    }
+    const dispatchAuthorityMethods = {
+      showAuthorityModal: this.state.showAuthorityModal, //显隐菜单
+      menuData: menuData, // 菜单数据
+      selectedKeys: selectedKeys, // 权限选中数据
+      handleEditModal: this.handleEditModal,
+      handleModalVisible: this.handleModalVisible,
+      hideDispatchAuthorityModal:this.showAuthorityModal
+    };
 
     return (
       <PageHeaderWrapper title="角色设置">
         <Card bordered={false}>
           <div>
-            <Button type="primary" onClick={()=>this.handleModalVisible(true)}>添加角色</Button>
+            <Button type="primary" onClick={() => this.handleModalVisible(true)}>添加角色</Button>
           </div>
           <StandardTable
             loading={loading}
@@ -366,8 +380,13 @@ class roleSetting extends Component {
             selectedRows={[]}
             columns={this.columns}
           />
-          <ManipulationRole {...parentMethods} modalVisible={modalVisible} />
-          {this.RenderRoleList(editRoleMethods)}
+
+          {/*编辑角色*/}
+          <ManipulationRole {...parentMethods} modalVisible={modalVisible}/>
+
+          {/*给角色分配权限*/}
+          <DispatchAuthority {...dispatchAuthorityMethods}  />
+
         </Card>
       </PageHeaderWrapper>
     );
@@ -375,5 +394,6 @@ class roleSetting extends Component {
   }
 
 }
+
 export default roleSetting;
 
