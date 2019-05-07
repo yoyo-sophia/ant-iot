@@ -333,4 +333,25 @@ export default {
   'GET /api/fake_list': getFakeList,
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
+
+
+  // 角色操作
+  'POST /api/deleteRole':(req,res) => {
+    res.send({
+      state:1,
+      msg:'ok'
+    })
+  }, // 移除角色
+  'POST /api/editRole':(req,res) => {
+    res.send({
+      state:1,
+      msg:'ok'
+    })
+  }, // 编辑角色
+  'POST /api/dispatchAuthorityToRole':(req,res) => {
+    res.send({
+      state:1,
+      msg:'ok'
+    })
+  }, // 分配权限给角色
 };

@@ -26,7 +26,6 @@ const CreateForm = Form.create()((props) => {
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
     >
-
       <FormItem label="角色列表">
         {
           form.getFieldDecorator("roleListItem", {
@@ -60,7 +59,6 @@ const CreateForm = Form.create()((props) => {
 }))
 
 class account_setting extends Component {
-
   state = {
     list: [],
     selectedRows: [],
@@ -137,49 +135,6 @@ class account_setting extends Component {
     });
   };
 
-  renderAllRoles = (data) => {
-    data.map((item, index) => {
-      return (
-        <Checkbox value={item.id}>{item.name}</Checkbox>
-      );
-    });
-  };
-
-
-  /*
-  * type:操作类型 1:分配权限 2:移除权限 3:移除用户
-  * data:与操作类型相关的数据
-  * */
-
-  /*
-  * type:1
-  * */
-
-  manipulationAuthority = (type, data) => {
-
-    const { modalVisible, roleLists } = this.state;
-
-    if (type === 1) {
-
-    }
-    return (
-      <Modal
-        destroyOnClose
-        title="创建角色"
-        visible={modalVisible}
-        // onOk={okHandle}
-        // onCancel={()=>handleModalVisible()}
-      >
-        {/*<p>是否移除此账号</p>*/}
-        <div>
-          {this.renderAllRoles(roleLists)}
-        </div>
-
-      </Modal>
-    );
-  };
-
-
   // 查看用户详细功能
   checkUserRole = (id) => {
     localStorage.setItem("accountAuthorityDetail", id);
@@ -194,30 +149,10 @@ class account_setting extends Component {
     });
   };
 
-  // 角色列表
-
-  render_roles_list() {
-    return this.state.roleLists.map((item, index) => {
-      return (
-        <div key={index}>
-          <Checkbox
-            defaultChecked={item.id}
-            // checked={item.id}
-          >
-            {item.name}
-          </Checkbox>
-        </div>
-      );
-    });
-  }
-
   /*dom结构渲染*/
   render() {
     const { authority: { accountDetailData }, loading } = this.props;
     const { selectedRows, roleLists, roleInitialLists, modalVisible } = this.state;
-
-    console.log(this.props);
-
 
     // 分配角色参数数据
     const dispatchMethod = {
@@ -236,8 +171,6 @@ class account_setting extends Component {
             loading={loading}
             data={accountDetailData}
             columns={this.columns}
-            // onSelectRow={this.handleSelectRows}
-            // onChange={this.handleStandardTableChange}
           />
           <CreateForm {...dispatchMethod} modalVisible={modalVisible}/>
         </Card>

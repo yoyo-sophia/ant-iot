@@ -174,14 +174,55 @@ export async function cardList() {
   return request(`/iot/v1/cards/new_list`);
 }
 
-// 账号列表
 
+
+/*
+*  权限相关接口
+* */
+
+// 角色列表
+export async function getRoleList() {
+  return request('/api/role/list');
+}
+
+// 删除角色
+export async function deleteRole(params) {
+  return request('/api/deleteRole', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}
+
+// 编辑角色
+export async function editRole(params) {
+  return request('/api/editRole', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}
+
+//  分配角色权限
+export async function dispatchAuthorityToRole(params) {
+  return request('/api/dispatchAuthorityToRole', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}
+
+
+
+// 账号列表
 export async function getAccountList() {
   return request('/api/account/list');
 }
 
 // 账号权限详情列表
-
 export async function getAccountDetail(params) {
   return request(`/api/account/detail?${stringify({
     id:params.id
