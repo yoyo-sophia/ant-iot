@@ -136,6 +136,9 @@ export default {
         if(localStorage.getItem('token')){
           window.location.href = '/dashboard/analysis'
         }
+        // else{
+        //   window.location.href = '/user/login'
+        // }
         if (typeof window.ga !== 'undefined') {
           window.ga('send', 'pageview', pathname + search);
         }

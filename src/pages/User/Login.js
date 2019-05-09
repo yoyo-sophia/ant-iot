@@ -13,14 +13,36 @@ class LoginPage extends Component {
     userName: "",
     password: "",
     verifyCode: "",
-    initialVerifyCode: "",
-    autoLogin: true
+    autoLogin: true,
+    btnLoading:false,
   };
 
   componentDidMount() {
     const { dispatch } = this.props;
+    // 获取token
     dispatch({
-      type: "login/getLoginCode"
+      type:'login/userToken',
+      callback:(res)=>{
+        if(res.state===1){
+          // 获取验证码
+          dispatch({
+            type: "login/getLoginCode",
+            payload:{
+              unique:res.data
+            }
+          });// 获取验证码
+        }
+      }
+    });
+  };
+
+  getLoginCode = () =>{
+    const {login:{token},dispatch} = this.props
+    dispatch({
+      type: "login/getLoginCode",
+      payload:{
+        unique:token
+      }
     });// 获取验证码
   };
 
@@ -31,8 +53,9 @@ class LoginPage extends Component {
   };
 
   handleSubmit = (e) => {
-    const { userName, password, verifyCode, initialVerifyCode, autoLogin } = this.state;
-    const { dispatch } = this.props;
+    const { userName, password, verifyCode, autoLogin } = this.state;
+    const { dispatch ,login:{loginCode,token}} = this.props;
+    let _this = this;
 
     e.preventDefault();
     if (!userName && !password && !verifyCode) {
@@ -43,10 +66,27 @@ class LoginPage extends Component {
       message.error("请输入验证码");
       return;
     }
-    if (verifyCode !== initialVerifyCode) {
-      message.error("验证码错误");
-      return;
-    }
+
+    dispatch({
+      type:'login/login',
+      payload:{
+        username:userName,
+        password:password,
+        unique:token,
+        code:verifyCode,
+      },
+      callback:(res) =>{
+        _this.setState({
+          btnLoading:false
+        });
+        message.error(res.msg);
+      }
+    });
+
+    // this.setState({
+    //   btnLoading:true
+    // })
+
   };
 
   changeAutoLogin = e => {
@@ -56,8 +96,7 @@ class LoginPage extends Component {
   };
 
   render() {
-    const { login } = this.props;
-
+    const { login:{token,loginCode} } = this.props;
     const { type, autoLogin, userName, password, verifyCode } = this.state;
     return (
       <div className={styles.main}>
@@ -93,16 +132,16 @@ class LoginPage extends Component {
               <div className={styles["input-wrap"]}>
                 <input name="verifyCode" value={verifyCode} onChange={this.handleChange.bind(this)} type="text"
                        placeholder="请输入验证码"/>
-                <img className={styles.verifyImg}
-                     src="http://n8.cmsfile.pg0.cn/group4/M00/03/BA/CgoOFlnoGnyAOQ54AABZQUxMv3E579.jpg?enable=&qt=75"
-                     alt=""/>
+                <img onClick={this.getLoginCode} className={styles.verifyImg}
+                     src={loginCode}
+                     alt="验证码"/>
               </div>
             </div>
 
-            <Checkbox className={styles["autoLogin-wrap"]} checked={autoLogin}
-                      onChange={this.changeAutoLogin}>记住密码</Checkbox>
+            {/*<Checkbox className={styles["autoLogin-wrap"]} checked={autoLogin}*/}
+                      {/*onChange={this.changeAutoLogin}>记住密码</Checkbox>*/}
 
-            <Button type="primary" htmlType="submit">登录</Button>
+            <Button type="primary" htmlType="submit" disabled={this.state.btnLoading} loading={this.state.btnLoading} >登录</Button>
 
           </Form>
 

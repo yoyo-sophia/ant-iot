@@ -166,12 +166,10 @@ export async function getUniqueToken() {
 }
 
 // 获取图文验证码
-export async function getLoginCode() {
-  return request (`/iot/code_img`,{
+export async function getLoginCode(payload) {
+  return request (`/iot/code_img?${stringify(payload)}`,{
     method:'GET',
-    payload:{
-      test:1
-    }
+    payload:payload
   })
 }
 
@@ -188,6 +186,9 @@ export async function getLoginCode() {
 export async function iotLogin(params) {
   // let paramFormData = new FormData();
   // paramFormData.append('data',JSON.stringify(params));
+
+  console.log(params);
+
   return request('/iot/v1/partners/login',{
     method:'POST',
     body:params,
@@ -198,7 +199,6 @@ export async function iotLogin(params) {
 * 获取套餐接口
 * */
 export async function planList(params) {
-  console.log(params);
   return request(`/iot/v1/plans?${stringify(params.params)}`);
 }
 

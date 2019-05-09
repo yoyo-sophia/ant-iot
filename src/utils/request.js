@@ -106,10 +106,9 @@ export default function request(url, option) {
       };
     }
   } else if(newOptions.method === 'GET'){
-    console.log(fingerprint);
     newOptions.headers = {
       ...newOptions.headers,
-      'Qyhl-Tokne':token(newOptions.payload),
+      'Qhyl-Token':token(newOptions.payload),
     }
   }
 
@@ -137,6 +136,9 @@ export default function request(url, option) {
       // using .json will report an error.
       if (newOptions.method === 'DELETE' || response.status === 204) {
         return response.text();
+      }
+      if(response.state === 12001){
+        router.push('/user/login');
       }
       return response.json();
     })

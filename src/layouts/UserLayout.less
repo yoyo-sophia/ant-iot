@@ -12,6 +12,16 @@
   flex: 1;
 }
 
+@media screen and (max-width:  @screen-md-min) {
+  .container {
+    background-image: url('../assets/imgs/login/bg_login_wrapper.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100% 100%;
+  }
+
+}
+
 @media (min-width: @screen-md-min) {
   .container {
     background-image: url('../assets/imgs/login/bg_login_wrapper.jpg');
@@ -49,18 +59,4 @@
   vertical-align: top;
 }
 
-//.title {
-//  position: relative;
-//  top: 2px;
-//  color: @heading-color;
-//  font-weight: 600;
-//  font-size: 33px;
-//  font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-//}
 
-//.desc {
-//  margin-top: 12px;
-//  margin-bottom: 40px;
-//  color: @text-color-secondary;
-//  font-size: @font-size-base;
-//}
