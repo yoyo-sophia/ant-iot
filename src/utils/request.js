@@ -94,19 +94,22 @@ export default function request(url, option) {
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
         ...newOptions.headers,
+        'Qhyl-Token':token(newOptions.body)
       };
       newOptions.body = JSON.stringify(newOptions.body);
-      newOptions.headers = {
-        'Qhyl-Token': token(newOptions.body)
-      }
     } else  {
-      // newOptions.body is FormData
       newOptions.headers = {
         // Accept: 'application/json',
         'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
+        'Qhyl-Token':token(newOptions.body),
         ...newOptions.headers,
       };
-      // newOptions.body = qs.stringify(newOptions.body);
+    }
+  } else if(newOptions.method === 'GET'){
+    console.log(fingerprint);
+    newOptions.headers = {
+      ...newOptions.headers,
+      'Qyhl-Tokne':token(newOptions.payload),
     }
   }
 
@@ -125,6 +128,7 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
+
   return fetch(url, newOptions)
     .then(checkStatus)
     .then(response => cachedSave(response, hashcode))

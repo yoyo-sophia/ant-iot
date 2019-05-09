@@ -1,32 +1,88 @@
 @import '~antd/lib/style/themes/default.less';
+// 修改login checkbox
 
 .main {
-  width: 368px;
-  margin: 0 auto;
-  @media screen and (max-width: @screen-sm) {
-    width: 95%;
-  }
-
-  .icon {
-    margin-left: 16px;
-    color: rgba(0, 0, 0, 0.2);
-    font-size: 24px;
-    vertical-align: middle;
-    cursor: pointer;
-    transition: color 0.3s;
-
-    &:hover {
-      color: @primary-color;
+  width: 30%;
+  margin-left: 60%;
+  .login-wrap{
+    flex: 1;
+    .logo-wrap{
+      .bg-logo{
+        display: block;
+        width: 198px;
+        height: 43px;
+        margin: -50px auto 75px;
+        background-image: url("../../assets/imgs/login/logo.png");
+      }
     }
-  }
-
-  .other {
-    margin-top: 24px;
-    line-height: 22px;
-    text-align: left;
-
-    .register {
-      float: right;
+    .account-wrap{
+      svg{
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+      }
+      .input-wrap{
+        position: relative;
+        margin-bottom: 20px;
+        span{
+          display: inline-block;
+          padding-bottom: 10px;
+          font-size: 16px;
+          color: #635e5e;
+        }
+      }
+      input{
+        width: 100%;
+        padding: 5px 0 5px 25px;
+        font-size: 16px;
+        line-height: 1;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        border-bottom: 1px solid #635e5e;
+        background-color: transparent;
+        &:focus{
+          border-bottom: 1px solid #144091;
+        }
+      }
     }
+    .verify-code-wrap{
+      input{
+        padding-left: 0;
+      }
+    }
+    .verifyImg{
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+      width: 90px;
+      height: 30px;
+    }
+    button{
+      display: block;
+      width: 100%;
+      margin-top: 35px;
+      border-radius: 20px;
+      background-color: #144091;
+      border-color: #144091;
+    } // 登录按钮
   }
+
+  @media screen and (max-width:  @screen-md-min) {
+    width: 75%;
+    margin: 0 auto;
+
+    .login-wrap{
+      .logo-wrap{
+        .bg-logo{
+          margin: 50px auto !important;
+        }
+      }
+    }
+
+  }
+
 }

@@ -1,167 +1,112 @@
-import React, { Component } from 'react';
-import { connect } from 'dva';
-// import { formatMessage, FormattedMessage } from 'umi/locale';
-import Link from 'umi/link';
-import { Checkbox, Alert, Icon } from 'antd';
-import Login from '@/components/Login';
-import styles from './Login.less';
-
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+import React, { Component } from "react";
+import { connect } from "dva";
+import { Form, Button, Checkbox, Icon, message } from "antd";
+import styles from "./Login.less";
 
 @connect(({ login, loading }) => ({
-  login,
-  submitting: loading.effects['login/login'],
+  login
+  // submitting: loading.effects["login/login"]
 }))
 class LoginPage extends Component {
   state = {
-    type: 'account',
-    autoLogin: true,
+    type: "account",
+    userName: "",
+    password: "",
+    verifyCode: "",
+    initialVerifyCode: "",
+    autoLogin: true
   };
 
-  onTabChange = type => {
-    this.setState({ type });
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "login/getLoginCode"
+    });// 获取验证码
   };
 
-  onGetCaptcha = () =>
-    new Promise((resolve, reject) => {
-      this.loginForm.validateFields(['mobile'], {}, (err, values) => {
-        if (err) {
-          reject(err);
-        } else {
-          const { dispatch } = this.props;
-          dispatch({
-            type: 'login/getCaptcha',
-            payload: values.mobile,
-          })
-            .then(resolve)
-            .catch(reject);
-        }
-      });
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value
     });
+  };
 
-  handleSubmit = (err, values) => {
-    const { type } = this.state;
-    console.log(values);
-    if (!err) {
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'login/login',
-        // payload:formdata
-        payload: {
-          ...values,
-          type,
-        },
-      });
+  handleSubmit = (e) => {
+    const { userName, password, verifyCode, initialVerifyCode, autoLogin } = this.state;
+    const { dispatch } = this.props;
+
+    e.preventDefault();
+    if (!userName && !password && !verifyCode) {
+      message.error("请输入完整的登录信息");
+      return;
+    }
+    if (userName && password && !verifyCode) {
+      message.error("请输入验证码");
+      return;
+    }
+    if (verifyCode !== initialVerifyCode) {
+      message.error("验证码错误");
+      return;
     }
   };
 
   changeAutoLogin = e => {
     this.setState({
-      autoLogin: e.target.checked,
+      autoLogin: e.target.checked
     });
   };
 
-  renderMessage = content => (
-    <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
-  );
-
   render() {
-    const { login, submitting } = this.props;
-    const { type, autoLogin } = this.state;
+    const { login } = this.props;
+
+    const { type, autoLogin, userName, password, verifyCode } = this.state;
     return (
       <div className={styles.main}>
-        <Login
-          defaultActiveKey={type}
-          onTabChange={this.onTabChange}
-          onSubmit={this.handleSubmit}
-          ref={form => {
-            this.loginForm = form;
-          }}
-        >
-          <Tab key="account" tab='账户密码登录'>
-            {login.status === 'error' &&
-              login.type === 'account' &&
-              !submitting &&
-              this.renderMessage('账户或密码错误（admin/ant.design）')}
-            <UserName
-              name="username"
-              placeholder="登录名: admin or user"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入用户名",
-                },
-              ]}
-            />
-            <Password
-              name="password"
-              placeholder="密码: ant.design"
-              rules={[
-                {
-                  required: true,
-                  message: "密码错误",
-                },
-              ]}
-              onPressEnter={() => this.loginForm.validateFields(this.handleSubmit)}
-            />
-          </Tab>
-          <Tab key="mobile" tab="手机号登录">
-            {login.status === 'error' &&
-              login.type === 'mobile' &&
-              !submitting &&
-              this.renderMessage(
-                formatMessage("验证码错误")
-              )}
-            <Mobile
-              name="mobile"
-              placeholder="手机号"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入手机号",
-                },
-                {
-                  pattern: /^1\d{10}$/,
-                  message: "手机号码错误",
-                },
-              ]}
-            />
-            <Captcha
-              name="captcha"
-              placeholder="请输入验证码"
-              countDown={120}
-              onGetCaptcha={this.onGetCaptcha}
-              getCaptchaButtonText="获取验证码"
-              getCaptchaSecondText="秒"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入验证码",
-                },
-              ]}
-            />
-          </Tab>
-          <div>
-            <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-              自动登录
-            </Checkbox>
-            <a style={{ float: 'right' }} href="">
-              忘记密码
-            </a>
+
+        <div className={styles["login-wrap"]}>
+
+          <div className={styles["logo-wrap"]}>
+            <span className={styles["bg-logo"]}/>
           </div>
-          <Submit loading={submitting}>
-            登录
-          </Submit>
-          <div className={styles.other}>
-            其他登录方式
-            <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
-            <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
-            <Icon type="weibo-circle" className={styles.icon} theme="outlined" />
-            <Link className={styles.register} to="/user/register">
-              注册账户
-            </Link>
-          </div>
-        </Login>
+
+          <Form onSubmit={this.handleSubmit}>
+
+            <div className={styles["account-wrap"]}>
+              <span>用户名</span>
+              <div className={styles["input-wrap"]}>
+                <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }}/>
+                <input name="userName" value={userName} onChange={this.handleChange.bind(this)} type="text"
+                       placeholder="请输入用户名"/>
+              </div>
+            </div>
+
+            <div className={styles["account-wrap"]}>
+              <span>密码</span>
+              <div className={styles["input-wrap"]}>
+                <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }}/>
+                <input name="password" value={password} onChange={this.handleChange.bind(this)} type="password"
+                       placeholder="请输入密码"/>
+              </div>
+            </div>
+
+            <div className={`${styles["account-wrap"]} ${styles["verify-code-wrap"]}`}>
+              <span>验证码</span>
+              <div className={styles["input-wrap"]}>
+                <input name="verifyCode" value={verifyCode} onChange={this.handleChange.bind(this)} type="text"
+                       placeholder="请输入验证码"/>
+                <img className={styles.verifyImg}
+                     src="http://n8.cmsfile.pg0.cn/group4/M00/03/BA/CgoOFlnoGnyAOQ54AABZQUxMv3E579.jpg?enable=&qt=75"
+                     alt=""/>
+              </div>
+            </div>
+
+            <Checkbox className={styles["autoLogin-wrap"]} checked={autoLogin}
+                      onChange={this.changeAutoLogin}>记住密码</Checkbox>
+
+            <Button type="primary" htmlType="submit">登录</Button>
+
+          </Form>
+
+        </div>
       </div>
     );
   }

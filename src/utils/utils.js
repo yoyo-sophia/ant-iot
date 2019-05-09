@@ -1,10 +1,19 @@
-import moment from 'moment';
-import React from 'react';
-import nzh from 'nzh/cn';
-import md5 from 'js-md5';
-import sha1 from 'js-sha1'
+import moment from "moment";
+import React from "react";
+import nzh from "nzh/cn";
+import md5 from "js-md5";
+import sha1 from "js-sha1";
 
-import { parse, stringify } from 'qs';
+import { parse, stringify } from "qs";
+
+function objKeySort(obj) {
+  let newkey = Object.keys(obj).sort();
+  let newObj = {};
+  for (let i = 0; i < newkey.length; i++) {
+    newObj[newkey[i]] = obj[newkey[i]];
+  }
+  return newObj;
+}//排序参数
 
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
@@ -14,14 +23,14 @@ export function getTimeDistance(type) {
   const now = new Date();
   const oneDay = 1000 * 60 * 60 * 24;
 
-  if (type === 'today') {
+  if (type === "today") {
     now.setHours(0);
     now.setMinutes(0);
     now.setSeconds(0);
     return [moment(now), moment(now.getTime() + (oneDay - 1000))];
   }
 
-  if (type === 'week') {
+  if (type === "week") {
     let day = now.getDay();
     now.setHours(0);
     now.setMinutes(0);
@@ -38,16 +47,16 @@ export function getTimeDistance(type) {
     return [moment(beginTime), moment(beginTime + (7 * oneDay - 1000))];
   }
 
-  if (type === 'month') {
+  if (type === "month") {
     const year = now.getFullYear();
     const month = now.getMonth();
-    const nextDate = moment(now).add(1, 'months');
+    const nextDate = moment(now).add(1, "months");
     const nextYear = nextDate.year();
     const nextMonth = nextDate.month();
 
     return [
       moment(`${year}-${fixedZero(month + 1)}-01 00:00:00`),
-      moment(moment(`${nextYear}-${fixedZero(nextMonth + 1)}-01 00:00:00`).valueOf() - 1000),
+      moment(moment(`${nextYear}-${fixedZero(nextMonth + 1)}-01 00:00:00`).valueOf() - 1000)
     ];
   }
 
@@ -55,11 +64,11 @@ export function getTimeDistance(type) {
   return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)];
 }
 
-export function getPlainNode(nodeList, parentPath = '') {
+export function getPlainNode(nodeList, parentPath = "") {
   const arr = [];
   nodeList.forEach(node => {
     const item = node;
-    item.path = `${parentPath}/${item.path || ''}`.replace(/\/+/g, '/');
+    item.path = `${parentPath}/${item.path || ""}`.replace(/\/+/g, "/");
     item.exact = true;
     if (item.children && !item.component) {
       arr.push(...getPlainNode(item.children, item.path));
@@ -79,10 +88,10 @@ export function digitUppercase(n) {
 
 function getRelation(str1, str2) {
   if (str1 === str2) {
-    console.warn('Two path are equal!'); // eslint-disable-line
+    console.warn("Two path are equal!"); // eslint-disable-line
   }
-  const arr1 = str1.split('/');
-  const arr2 = str2.split('/');
+  const arr1 = str1.split("/");
+  const arr2 = str2.split("/");
   if (arr2.every((item, index) => item === arr1[index])) {
     return 1;
   }
@@ -118,7 +127,7 @@ export function getRoutes(path, routerData) {
     routePath => routePath.indexOf(path) === 0 && routePath !== path
   );
   // Replace path to '' eg. path='user' /user/name => name
-  routes = routes.map(item => item.replace(path, ''));
+  routes = routes.map(item => item.replace(path, ""));
   // Get the route to be rendered to remove the deep rendering
   const renderArr = getRenderArr(routes);
   // Conversion and stitching parameters
@@ -128,17 +137,17 @@ export function getRoutes(path, routerData) {
       exact,
       ...routerData[`${path}${item}`],
       key: `${path}${item}`,
-      path: `${path}${item}`,
+      path: `${path}${item}`
     };
   });
   return renderRoutes;
 }
 
 export function getPageQuery() {
-  return parse(window.location.href.split('?')[1]);
+  return parse(window.location.href.split("?")[1]);
 }
 
-export function getQueryPath(path = '', query = {}) {
+export function getQueryPath(path = "", query = {}) {
   const search = stringify(query);
   if (search.length) {
     return `${path}?${search}`;
@@ -155,7 +164,7 @@ export function isUrl(path) {
 
 export function formatWan(val) {
   const v = val * 1;
-  if (!v || Number.isNaN(v)) return '';
+  if (!v || Number.isNaN(v)) return "";
 
   let result = val;
   if (val > 10000) {
@@ -165,11 +174,11 @@ export function formatWan(val) {
         {result}
         <span
           style={{
-            position: 'relative',
+            position: "relative",
             top: -2,
             fontSize: 14,
-            fontStyle: 'normal',
-            marginLeft: 2,
+            fontStyle: "normal",
+            marginLeft: 2
           }}
         >
           万
@@ -182,14 +191,14 @@ export function formatWan(val) {
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
 export function isAntdPro() {
-  return window.location.hostname === 'preview.pro.ant.design';
+  return window.location.hostname === "preview.pro.ant.design";
 }
 
 export const importCDN = (url, name) =>
   new Promise(resolve => {
-    const dom = document.createElement('script');
+    const dom = document.createElement("script");
     dom.src = url;
-    dom.type = 'text/javascript';
+    dom.type = "text/javascript";
     dom.onload = () => {
       resolve(window[name]);
     };
@@ -198,23 +207,24 @@ export const importCDN = (url, name) =>
 
 
 export function token(params) {
-  if (JSON.stringify(params) !== '{}') {
-    let paramsBak = {};
-    for (var i in params) {
-      if (Object.prototype.toString.call(params[i]) !== '[object Undefined]' &&  Object.prototype.toString.call(params[i]) !== '[object Null]') {
-        paramsBak[i] = params[i];
-      }
+  (JSON.stringify(params) !== "{}") ? params : params = {};
+  // if (JSON.stringify(params) !== '{}') {
+  let paramsBak = {};
+  for (var i in params) {
+    if (Object.prototype.toString.call(params[i]) !== "[object Undefined]" && Object.prototype.toString.call(params[i]) !== "[object Null]") {
+      paramsBak[i] = params[i];
     }
-    paramsBak.salt = 'qhyl@#6688';
-    let sortParams = objKeySort(paramsBak);
-    let str = ''
-    for (let i in sortParams) {
-      str += `${i}=${sortParams[i]}&`
-    }
-    str = str.substr(0, str.length - 1);
-
-    str = sha1(str);
-    str = md5(str);
-    return str
   }
+  paramsBak.salt = "qhyl@#6688";
+  let sortParams = objKeySort(paramsBak);
+  let str = "";
+  for (let i in sortParams) {
+    str += `${i}=${sortParams[i]}&`;
+  }
+  str = str.substr(0, str.length - 1);
+
+  str = sha1(str);
+  str = md5(str);
+  return str;
+  // }
 }

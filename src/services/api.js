@@ -167,7 +167,12 @@ export async function getUniqueToken() {
 
 // 获取图文验证码
 export async function getLoginCode() {
-  return request ('/iot/code_img');
+  return request (`/iot/code_img`,{
+    method:'GET',
+    payload:{
+      test:1
+    }
+  })
 }
 
 
