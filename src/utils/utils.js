@@ -1,6 +1,9 @@
 import moment from 'moment';
 import React from 'react';
 import nzh from 'nzh/cn';
+import md5 from 'js-md5';
+import sha1 from 'js-sha1'
+
 import { parse, stringify } from 'qs';
 
 export function fixedZero(val) {
@@ -192,3 +195,26 @@ export const importCDN = (url, name) =>
     };
     document.head.appendChild(dom);
   });
+
+
+export function token(params) {
+  if (JSON.stringify(params) !== '{}') {
+    let paramsBak = {};
+    for (var i in params) {
+      if (Object.prototype.toString.call(params[i]) !== '[object Undefined]' &&  Object.prototype.toString.call(params[i]) !== '[object Null]') {
+        paramsBak[i] = params[i];
+      }
+    }
+    paramsBak.salt = 'qhyl@#6688';
+    let sortParams = objKeySort(paramsBak);
+    let str = ''
+    for (let i in sortParams) {
+      str += `${i}=${sortParams[i]}&`
+    }
+    str = str.substr(0, str.length - 1);
+
+    str = sha1(str);
+    str = md5(str);
+    return str
+  }
+}

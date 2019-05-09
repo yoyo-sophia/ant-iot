@@ -6,6 +6,7 @@ import {
   deleteRole, // 移除角色
   editRole, // 编辑角色
   dispatchAuthorityToRole, //分配角色权限
+  getCurRoleAuthority, // 获取当前角色权限
 
 } from '@/services/api';
 
@@ -80,6 +81,10 @@ export default {
         payload:response,
       });
     },// 给角色分配权限
+    *fetch_curRole_authority({payload,callback},{call,put}){
+      const response = yield call(getCurRoleAuthority,payload);
+      callback(response);
+    },//获取角色列表当前拥有的权限
   },
   reducers: {
     /*

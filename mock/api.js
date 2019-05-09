@@ -354,4 +354,8 @@ export default {
       msg:'ok'
     })
   }, // 分配权限给角色
+  'GET /api/getCurRoleAuthority':{
+    state: 1,
+    data: ['/dashboard'],
+  },
 };

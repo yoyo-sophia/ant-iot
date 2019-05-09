@@ -81,7 +81,7 @@ export default {
   },
   proxy: {
     '/iot': {
-      target: 'https://iottt.china-m2m.com',
+      target: 'http://iotmanager-test.china-m2m.com',
       changeOrigin: true,
       pathRewrite: { '^/iot': '' },
     },

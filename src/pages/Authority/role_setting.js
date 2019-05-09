@@ -64,15 +64,15 @@ const DispatchAuthority = (props) => {
   const state = {
     checkedKeys: [],
     expandedKeys: [],
-    selectedKeys: [],
+    selectedKeys: []
   };
 
   const {
     menuData,
     showAuthorityModal,
-    selectKeys,
     confirmDispatchAuthority,
-    hideDispatchAuthorityModal
+    hideDispatchAuthorityModal,
+    defaultSelectedKeys
   } = props;
 
   // 循环创建菜单权限列表
@@ -101,13 +101,13 @@ const DispatchAuthority = (props) => {
   };
 
   // 权限分配相关操作
-  const onExpand = (expandedKeys,e) => {
+  const onExpand = (expandedKeys, e) => {
     console.log("onExpand", expandedKeys);
     console.log(e);
 
   };
 
-  const onCheck = (checkedKeys,e) => {
+  const onCheck = (checkedKeys, e) => {
     console.log("onCheck", checkedKeys);
     console.log(e);
     state.checkedKeys = checkedKeys;
@@ -117,10 +117,10 @@ const DispatchAuthority = (props) => {
     console.log("onSelect", info);
   };
 
-  const submitAuthoritySetting = () =>{
+  const submitAuthoritySetting = () => {
 
     // hideDispatchAuthorityModal(false);
-  }
+  };
 
   return (
     <Modal
@@ -131,9 +131,9 @@ const DispatchAuthority = (props) => {
     >
       <Tree
         checkable
+        checkedKeys={defaultSelectedKeys}
         onExpand={onExpand}
         onCheck={onCheck}
-        selectkeys={selectKeys}
         onSelect={onSelect}
         selectable={false}
       >
@@ -171,7 +171,7 @@ class roleSetting extends Component {
     * 权限分配相关参数
     * */
     showAuthorityModal: false,
-    defaultSelectedKeys:{},
+    defaultSelectedKeys: null,
   };
 
   columns = [
@@ -192,9 +192,9 @@ class roleSetting extends Component {
       title: "操作",
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.showAuthorityModal(true)}>分配权限</a>
+          <a onClick={() => this.showAuthorityModal(true, record)}>分配权限</a>
           <Divider type="vertical"/>
-          <a onClick={() => this.handleModalVisible(true, record, 1)}>编辑</a>
+          <a onClick={() => this.handleModalVisible(true, record)}>编辑</a>
           <Divider type="vertical"/>
           <a onClick={() => this.removeRole(record)}>移除</a>
           <Divider type="vertical"/>
@@ -216,10 +216,33 @@ class roleSetting extends Component {
   * */
 
   // 分配权限Modal
-  showAuthorityModal = (flag) => {
+  showAuthorityModal = (flag, data) => {
+
+    if (data) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: "authority/fetch_curRole_authority",
+        payload:{
+          id:data.id
+        },
+        callback: (res) => {
+          if (res.state === 1) {
+            this.setState({
+              defaultSelectedKeys: res.data
+            })
+          }else{
+            message.error(res.msg)
+          }
+        }
+      });
+      // 获取当前角色权限
+
+    }
+
     this.setState({
       showAuthorityModal: !!flag
     });
+
   };
 
   // 移除角色
@@ -264,22 +287,6 @@ class roleSetting extends Component {
     router.push("/authority/role_detail");
   };
 
-  // 重置表单
-  handleFormRest = () => {
-    const { form, dispatch } = this.props;
-
-    form.resetFields();
-
-    this.setValues({
-      formValues: {}
-    });
-
-    dispatch({
-      type: "rule/fetch",
-      payload: {}
-    });
-  };
-
   // 搜索
   handleSearch = e => {
     e.preventDefault();
@@ -310,7 +317,7 @@ class roleSetting extends Component {
   * data 需要修改的数据
   * isEdit 当前为修改数据还是新增数据
   * */
-  handleModalVisible = (flag, data, isEdit) => {
+  handleModalVisible = (flag, data) => {
     if (flag && data) {
       this.setState({
         editRoleData: { ...data, isEdit: 1 }
@@ -351,7 +358,7 @@ class roleSetting extends Component {
       menuData
     } = this.props;
 
-    const { modalVisible, editRoleModal, selectedKeys } = this.state;
+    const { modalVisible, editRoleModal, defaultSelectedKeys } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -362,10 +369,10 @@ class roleSetting extends Component {
     const dispatchAuthorityMethods = {
       showAuthorityModal: this.state.showAuthorityModal, //显隐菜单
       menuData: menuData, // 菜单数据
-      selectedKeys: selectedKeys, // 权限选中数据
+      defaultSelectedKeys: defaultSelectedKeys, // 权限选中数据
       handleEditModal: this.handleEditModal,
       handleModalVisible: this.handleModalVisible,
-      hideDispatchAuthorityModal:this.showAuthorityModal
+      hideDispatchAuthorityModal: this.showAuthorityModal
     };
 
     return (
