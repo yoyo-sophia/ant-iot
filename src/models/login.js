@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router';
 import { stringify } from 'qs';
-import { fakeAccountLogin, getFakeCaptcha ,iotLogin} from '@/services/api';
+import { fakeAccountLogin, getFakeCaptcha ,iotLogin,getUniqueToken,getLoginCode} from '@/services/api';
 import { setAuthority } from '@/utils/authority';
 // import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized';
@@ -10,18 +10,28 @@ export default {
 
   state: {
     status: undefined,
+    loginCode:'',
   },
 
   effects: {
+    *userToken({payload,callback},{call,put}){
+      const response = yield call(getUniqueToken);
+      callback(response);
+    },
+    *getLoginCode({payload},{call,put}){
+      const response = yield call(getLoginCode);
+      yield put({
+        type:'saveLoginCode',
+        payload:response,
+      })
+    },
     *login({ payload }, { call, put }) {
-      // const response = yield call(fakeAccountLogin, payload);
       const response = yield call(iotLogin, payload);
       yield put({
         type: 'changeLoginStatus',
         payload: response,
       });
       // Login successfully
-      console.log(response);
       if (response.status === 1) {
         reloadAuthorized();
 
@@ -72,7 +82,6 @@ export default {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      console.log(payload);
       setAuthority('admin');
       // setAuthority(payload.currentAuthority);
       return {
@@ -81,5 +90,11 @@ export default {
         type: payload.type,
       };
     },
+    saveLoginCode(state,{payload}){
+      return{
+        ...state,
+        loginCode:payload
+      }
+    }
   },
 };

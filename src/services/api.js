@@ -1,16 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-const formmaterParams = params =>{
-  if(Object.prototype.toString.call(params)=='[object Object]'){
-    let paramsStr = '';
-    for(item in params){
-      paramsStr += item+'='+params[item]+'&';
-    }
-    return paramsStr.substr(0,paramsStr.length-1)
-  }
-}
-
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
@@ -144,18 +134,58 @@ export async function getMockMenu() {
 }
 
 
-// 获取iot测试环境data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
-* 登录接口
+* iot 测试环境
 * */
 
-export async  function iotLogin(params) {
-  let paramFormData = new FormData();
-  paramFormData.append('data',JSON.stringify(params));
-  return request('/iot/users/login',{
+/*
+* About Login
+* */
+
+// 获取标识符
+export async function getUniqueToken() {
+  return request('/iot/unique')
+}
+
+// 获取图文验证码
+export async function getLoginCode() {
+  return request ('/iot/code_img');
+}
+
+
+/*
+* end Login
+* */
+
+
+
+
+// 登录接口
+
+export async function iotLogin(params) {
+  // let paramFormData = new FormData();
+  // paramFormData.append('data',JSON.stringify(params));
+  return request('/iot/v1/partners/login',{
     method:'POST',
-    body:paramFormData
+    body:params,
   })
 }
 
@@ -215,11 +245,17 @@ export async function dispatchAuthorityToRole(params) {
   });
 }
 
+// 获取当前角色的权限列表
+export async function getCurRoleAuthority(params) {
+  return request('/api/getCurRoleAuthority');
+}
 
 
 // 账号列表
-export async function getAccountList() {
-  return request('/api/account/list');
+export async function getAccountList(params) {
+  return request(`/api/account/list?${stringify({
+    id:params.id
+  })}`);
 }
 
 // 账号权限详情列表

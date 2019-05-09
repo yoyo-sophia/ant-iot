@@ -2,7 +2,7 @@ import fetch from 'dva/fetch';
 import { notification } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';
-import { isAntdPro } from './utils';
+import { isAntdPro,token } from './utils';
 import qs from 'qs'
 
 const codeMessage = {
@@ -80,7 +80,7 @@ export default function request(url, option) {
     .digest('hex');
 
   const defaultOptions = {
-    credentials: 'include',
+    credentials: 'include'
   };
   const newOptions = { ...defaultOptions, ...options };
   if (
@@ -96,11 +96,14 @@ export default function request(url, option) {
         ...newOptions.headers,
       };
       newOptions.body = JSON.stringify(newOptions.body);
+      newOptions.headers = {
+        'Qhyl-Token': token(newOptions.body)
+      }
     } else  {
       // newOptions.body is FormData
       newOptions.headers = {
-        Accept: 'application/json',
-        // 'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
+        // Accept: 'application/json',
+        'Content-Type':'application/x-www-form-urlencoded;charset=utf-8',
         ...newOptions.headers,
       };
       // newOptions.body = qs.stringify(newOptions.body);
