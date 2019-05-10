@@ -1,6 +1,6 @@
 import { routerRedux } from "dva/router";
 import { stringify } from "qs";
-import { fakeAccountLogin, getFakeCaptcha, iotLogin, getUniqueToken, getLoginCode } from "@/services/api";
+import { fakeAccountLogin, getFakeCaptcha, iotLogin, iotLogout,getUniqueToken, getLoginCode } from "@/services/api";
 import { setAuthority } from "@/utils/authority";
 // import { getPageQuery } from '@/utils/utils';
 import { reloadAuthorized } from "@/utils/Authorized";
@@ -36,7 +36,6 @@ export default {
         type: "changeLoginStatus",
         payload: response
       });
-
       if (response.state !== 1) {
         callback(response);
       }
@@ -70,30 +69,35 @@ export default {
       yield call(getFakeCaptcha, payload);
     },
 
-    * logout(_, { put }) {
-      yield put({
-        type: "changeLoginStatus",
-        payload: {
-          status: false,
-          currentAuthority: "guest"
-        }
-      });
-      reloadAuthorized();
-      yield put(
-        routerRedux.push({
-          pathname: "/user/login",
-          search: stringify({
-            redirect: window.location.href
+    * logout(_, { call, put }) {
+      const response = yield call(iotLogout);
+      if(response.state === 1){
+        localStorage.removeItem('token');
+        yield put(
+          routerRedux.push({
+            pathname: "/user/login",
+            search: stringify({
+              redirect: window.location.href
+            })
           })
-        })
-      );
+        );
+      }
+      // yield put({
+      //   type: "changeLoginStatus",
+      //   payload: {
+      //     status: false,
+      //     currentAuthority: "guest"
+      //   }
+      // });
+      // reloadAuthorized();
+
     }
   },
 
   reducers: {
     changeLoginStatus(state, { payload }) {
       localStorage.removeItem("token");
-      setAuthority("admin");
+      // setAuthority("admin");
       // setAuthority(payload.currentAuthority);
       return {
         ...state,

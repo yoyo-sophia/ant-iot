@@ -172,6 +172,23 @@ export async function getLoginCode(payload) {
     payload:payload
   })
 }
+// 登录接口
+export async function iotLogin(params) {
+  // let paramFormData = new FormData();
+  // paramFormData.append('data',JSON.stringify(params));
+  return request('/iot/v1/partners/login',{
+    method:'POST',
+    body:params,
+  })
+}
+
+// 登出接口
+export async function iotLogout() {
+   return request('/iot/v1/partners/logout',{
+     method:'GET'
+   })
+}
+
 
 
 /*
@@ -181,19 +198,7 @@ export async function getLoginCode(payload) {
 
 
 
-// 登录接口
 
-export async function iotLogin(params) {
-  // let paramFormData = new FormData();
-  // paramFormData.append('data',JSON.stringify(params));
-
-  console.log(params);
-
-  return request('/iot/v1/partners/login',{
-    method:'POST',
-    body:params,
-  })
-}
 
 /*
 * 获取套餐接口
