@@ -357,18 +357,6 @@ class TableList extends PureComponent {
     dispatch({
       type: 'rule/fetch',
     });
-
-    dispatch({
-      type:'plan/fetch',
-      payload:{
-        params:{
-          source:0,
-          status:1,
-          group:0
-        }
-      },
-    })
-
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -650,6 +638,8 @@ class TableList extends PureComponent {
         <Menu.Item key="approval">批量审批</Menu.Item>
       </Menu>
     );
+
+    console.log(data);
 
     const parentMethods = {
       handleAdd: this.handleAdd,

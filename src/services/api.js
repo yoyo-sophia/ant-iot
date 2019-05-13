@@ -11,7 +11,7 @@ export async function queryActivities() {
 }
 
 export async function queryRule(params) {
-  return request(`/api/rule?${stringify(params)}`);
+  return OriginalRequest(`/api/rule?${stringify(params)}`);
 }
 
 export async function removeRule(params) {
@@ -263,7 +263,7 @@ export async function getMenuApiList(payload) {
 
 // 角色列表
 export async function getRoleList(params) {
-  return request('/iot/v1/authorities/menu_list',{
+  return request('/iot/v1/authorities/list',{
     method:'GET',
     payload:params
   });
@@ -301,7 +301,7 @@ export async function editRole(params) {
 
 //  分配角色权限
 export async function dispatchAuthorityToRole(params) {
-  return request('/api/dispatchAuthorityToRole', {
+  return request('/iot/v1/authorities/menu/allocation', {
     method: 'POST',
     body: {
       ...params,

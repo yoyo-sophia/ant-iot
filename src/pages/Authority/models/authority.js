@@ -33,11 +33,9 @@ export default {
 
     },// 账号详情
     roleData:{
-      list:[],
+      data:[],
       pagination:{},
     },// 角色详情
-    deleteRole:{},
-    editRole:{},
     dispatchRole:{},
   },
   effects:{
@@ -48,7 +46,7 @@ export default {
       const response = yield call(getAccountList, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: response.data,
       });
     },// 权限列表
     *fetch_account_detail({payload},{call,put}){
@@ -69,27 +67,22 @@ export default {
         payload:response
       });
     },// 角色列表
+    *add_role({payload,callback},{call,put}){
+      const response = yield call(addRole,payload);
+      callback(response);
+    },
     *delete_role({payload,callback},{call,put}){
       const response = yield call(deleteRole,payload);
-      yield put({
-        type:'saveDeleteRole',
-        payload:response,
-      });
       callback(response);
     },// 删除角色
-    *edit_role({payload},{call,put}){
+    *edit_role({payload,callback},{call,put}){
       const response = yield call(editRole,payload);
-      yield put({
-        type:'saveEditRole',
-        payload:response,
-      });
+      callback(response);
+
     },// 编辑角色
-    *dispatch_role_to_partner({payload},{call,put}){
+    *dispatch_authority_to_role({payload,callback},{call,put}){
       const response = yield call(dispatchAuthorityToRole,payload);
-      yield put({
-        type:'saveDispatchRoleToPartner',
-        payload:response,
-      });
+      callback(response);
     },// 给角色分配权限
     *fetch_curRole_authority({payload,callback},{call,put}){
       const response = yield call(getCurRoleAuthority,payload);
@@ -143,28 +136,11 @@ export default {
     saveRoleList(state,action){
       return{
         ...state,
-        roleData: action.payload,
+        roleData: {
+          ...action.payload,
+        },
       }
     }, // 角色列表
-    saveDeleteRole(state,action){
-      return{
-        ...state,
-        deleteRole:action.payload,
-      }
-    },// 移除角色
-    saveEditRole(state,action){
-      return{
-        ...state,
-        editRole:action.payload,
-      }
-    },// 编辑角色
-    saveDispatchRoleToPartner(state,action){
-      return{
-        ...state,
-        dispatchRole:action.payload,
-      }
-    }, // 给角色分配权限
-
     /*
     * 节点相关
     * */
