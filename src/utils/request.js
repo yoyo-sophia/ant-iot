@@ -137,32 +137,35 @@ export default function request(url, option) {
       if (newOptions.method === 'DELETE' || response.status === 204) {
         return response.text();
       }
+      // 获取当前路径 判断是否为登录页
       if(response.state === 12001){
         router.push('/user/login');
       }
       return response.json();
     })
     .catch(e => {
-      const status = e.name;
-      if (status === 401) {
-        // @HACK
-        /* eslint-disable no-underscore-dangle */
-        window.g_app._store.dispatch({
-          type: 'login/logout',
-        });
-        return;
-      }
-      // environment should not be used
-      if (status === 403) {
-        router.push('/exception/403');
-        return;
-      }
-      if (status <= 504 && status >= 500) {
-        router.push('/exception/500');
-        return;
-      }
-      if (status >= 404 && status < 422) {
-        router.push('/exception/404');
+      if(localStorage.getItem('token')){
+        const status = e.name;
+        if (status === 401) {
+          // @HACK
+          /* eslint-disable no-underscore-dangle */
+          window.g_app._store.dispatch({
+            type: 'login/logout',
+          });
+          return;
+        }
+        // environment should not be used
+        if (status === 403) {
+          router.push('/exception/403');
+          return;
+        }
+        if (status <= 504 && status >= 500) {
+          router.push('/exception/500');
+          return;
+        }
+        if (status >= 404 && status < 422) {
+          router.push('/exception/404');
+        }
       }
     });
 }

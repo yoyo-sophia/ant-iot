@@ -17,10 +17,12 @@ export default {
   effects: {
     * userToken({ payload, callback }, { call, put }) {
       const response = yield call(getUniqueToken);
-      yield put({
-        type: "saveToken",
-        payload: response.state === 1 ? response.data : null
-      });
+      if(response.state==1){
+        yield put({
+          type: "saveToken",
+          payload:response.data
+        });
+      }
       callback(response);
     },
     * getLoginCode({ payload }, { call, put }) {
@@ -32,18 +34,15 @@ export default {
     },
     * login({ payload, callback }, { call, put }) {
       const response = yield call(iotLogin, payload);
-      yield put({
-        type: "changeLoginStatus",
-        payload: response
-      });
       if (response.state !== 1) {
         callback(response);
       }
-
       if (response.state === 1) {
-
-        localStorage.setItem("token", this.state.token);
-        reloadAuthorized();
+        yield put({
+          type: "loginSuccess",
+          payload: response
+        });
+        // reloadAuthorized();
         // const urlParams = new URL(window.location.href);
         //
         // const params = getPageQuery();
@@ -61,7 +60,8 @@ export default {
         //   }
         // }
         // yield put(routerRedux.replace(redirect || '/'));
-        yield put(routerRedux.replace("/dashboard/analysis"));
+
+        yield put(routerRedux.replace("/landing"));
       }
     },
 
@@ -72,7 +72,7 @@ export default {
     * logout(_, { call, put }) {
       const response = yield call(iotLogout);
       if(response.state === 1){
-        localStorage.removeItem('token');
+        localStorage.clear();
         yield put(
           routerRedux.push({
             pathname: "/user/login",
@@ -95,10 +95,16 @@ export default {
   },
 
   reducers: {
+    loginSuccess(state,{payload}){
+      localStorage.setItem('token',state.token);
+      return{
+        ...state
+      }
+    },
     changeLoginStatus(state, { payload }) {
-      localStorage.removeItem("token");
       // setAuthority("admin");
       // setAuthority(payload.currentAuthority);
+      localStorage.removeItem("token");
       return {
         ...state,
         token: null,

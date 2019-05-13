@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "dva";
+import router from 'umi/router';
 import { Form, Button, Checkbox, Icon, message } from "antd";
 import styles from "./Login.less";
 
@@ -19,25 +20,29 @@ class LoginPage extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    // 获取token
-    dispatch({
-      type:'login/userToken',
-      callback:(res)=>{
-        if(res.state===1){
-          // 获取验证码
-          dispatch({
-            type: "login/getLoginCode",
-            payload:{
-              unique:res.data
-            }
-          });// 获取验证码
+    if(!localStorage.getItem('token')){
+      // 获取token
+      dispatch({
+        type:'login/userToken',
+        callback:(res)=>{
+          if(res.state===1){
+            // 获取验证码
+            dispatch({
+              type: "login/getLoginCode",
+              payload:{
+                unique:res.data
+              }
+            });// 获取验证码
+          }
         }
-      }
-    });
+      });
+    }else{
+      router.push('/landing')
+    }
   };
 
   getLoginCode = () =>{
-    const {login:{token},dispatch} = this.props
+    const {login:{token},dispatch} = this.props;
     dispatch({
       type: "login/getLoginCode",
       payload:{

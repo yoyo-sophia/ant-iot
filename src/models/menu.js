@@ -1,9 +1,10 @@
 import memoizeOne from 'memoize-one';
 import isEqual from 'lodash/isEqual';
-// import { formatMessage } from 'umi/locale';
+import router from 'umi/router';
 import Authorized from '@/utils/Authorized';
 import { menu } from '../defaultSettings';
-import { getMockMenu } from '@/services/api';
+import { getMockMenu ,getMenu} from '@/services/api';
+import {GetUrlRelativePath} from '../utils/utils'
 
 const { check } = Authorized;
 
@@ -104,23 +105,23 @@ export default {
   effects: {
     *getMenuData({ payload }, {call, put }) {
       const { routes, authority } = payload;
-      const response = yield call(getMockMenu, payload);
-
-
-      if(response){
-        const menuData = filterMenuData(memoizeOneFormatter(response, authority));
-
+      const response = yield call(getMenu, payload);
+      if(response.state === 1){
+        const menuData = filterMenuData(memoizeOneFormatter(response.data, authority));
         const breadcrumbNameMap = memoizeOneGetBreadcrumbNameMap(menuData);
+        // 重定向当前角色首个路径
+        if(response.data.length){
+          let curPath = GetUrlRelativePath();
+          let firstMenuHasChild = menuData[0].children.length ? true : false ;
+          if(curPath === '/landing'){
+            firstMenuHasChild ? router.push(menuData[0].children[0].path) : router.push('/exception/403')
+          }
+        }
         yield put({
           type: 'save',
           payload: { menuData, breadcrumbNameMap },
         });
-
       }
-
-
-      // console.log(routes);
-
     },
   },
 
@@ -130,20 +131,6 @@ export default {
         ...state,
         ...action.payload,
       };
-    },
-  },
-  subscriptions: {
-    setup({ history }) {
-      // Subscribe history(url) change, trigger `load` action if pathname is `/`
-      // 类似vue的路由处理
-      return history.listen(({ pathname, search }) => {
-        if(localStorage.getItem('token')){
-          window.location.href = '/dashboard/analysis'
-        }
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search);
-        }
-      });
     },
   },
 };

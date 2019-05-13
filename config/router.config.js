@@ -19,6 +19,7 @@ export default [
     routes: [
       // dashboard
       { path: '/', redirect: '/user/login' },
+      {path:'/landing',name:'landing',component:'./Landing/index'},
       // { path: '/', redirect: '/dashboard/analysis' },
       {
         path: '/dashboard',

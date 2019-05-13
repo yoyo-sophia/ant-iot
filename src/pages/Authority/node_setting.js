@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "dva";
-import { Row, Col, Tree, Card, Form, Input, Radio, Button } from "antd";
+import { Row, Col, Tree, Card, Form, Input, Radio, Button ,message,Modal} from "antd";
 
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
 
@@ -8,6 +8,7 @@ import style from "./css/node-setting.less";
 
 const DirectoryTree = Tree.DirectoryTree;
 const { TreeNode } = Tree;
+const confirm = Modal.confirm;
 
 @connect(({ menu: menuModel, authority, loading }) => ({
   authority,
@@ -17,6 +18,12 @@ const { TreeNode } = Tree;
 
 class node_setting extends Component {
   state = {
+    isAdd:false,
+    curSelectNodeID:'',
+    curSelectNodeName:'',
+    curSelectKey:[],
+    curSelectMenuData:{},
+
     currentNodeIndex: "",
     nodeList: [],
     node_radio_data:{
@@ -26,20 +33,10 @@ class node_setting extends Component {
     },
     newMenuList:[],
   };
+
   componentDidMount() {
-
-
-    // dispatch({
-    //   type: 'menu/getMenuData',
-    //   payload: { routes, authority },
-    // });
-
+    console.log(this.props);
   }
-
-  componentWillMount() {
-
-  }
-
   /*业务处理*/
 
   /*
@@ -65,12 +62,12 @@ class node_setting extends Component {
       return (
         <TreeNode
           title={item.name}
-          key={item.path}>
+          key={item.menu_id}>
           {this.getNavMenuItems(item.children)}
         </TreeNode>
       );
     }
-    return <TreeNode title={item.name} key={item.path} isLeaf/>;
+    return <TreeNode title={item.name} key={item.menu_id} isLeaf/>;
   };
 
   // 扁平化菜单数据
@@ -85,14 +82,50 @@ class node_setting extends Component {
     })
   }
 
-
   /*
   * 提交节点设置
   * */
   handleSubmit = e => {
+    const { isAdd ,curSelectMenuData} = this.state;
+    const {dispatch} = this.props;
     e.preventDefault();
+    if(!isAdd){
+      if(!this.state.curSelectNodeID){
+        message.error('请选择需要修改的节点或选择新增节点');
+        return
+      }
+    }
     this.props.form.validateFields((err, values) => {
+      const {curSelectMenuData} = this.state;
       if (!err) {
+        if(isAdd){
+          let parent_menu_id = curSelectMenuData.is_top === 1 ? curSelectMenuData.menu_id : '',
+              params = {
+                name:values.node_name,
+                url:values.node_url,
+                position:values.node_sort,
+                is_top:values.node_role === 1 ? 1:0,
+                icon:values.node_icon,
+              };
+          if(parent_menu_id) params.parent_menu_id = parent_menu_id;
+          dispatch({
+            type:'authority/createMenuNode',
+            payload:params,
+            callback:(res)=>{
+              if(res.state===1){
+                message.error('新增节点成功');
+                dispatch({
+                  type:'menu/getMenuData'
+                })
+              };
+            },
+
+          })
+        } else{
+          // 修改菜单
+
+
+        }
         console.log("Recevied values of form", values);
       }
     });
@@ -103,21 +136,30 @@ class node_setting extends Component {
   * */
 
   onSelect = (selectedKeys) => {
-
     let choose_menu_data = {};
-
     this.state.newMenuList
       .map(item=>{
-        if(selectedKeys[0]==item.path){
+        if(selectedKeys[0]==item.menu_id){
           choose_menu_data = item
         }
       })
 
     this.props.form.setFieldsValue({
       node_url: choose_menu_data.path,
-      node_name:choose_menu_data.name,
-      node_icon : choose_menu_data.icon ? choose_menu_data.icon:'',
-    })
+      node_name: choose_menu_data.name,
+      node_icon: choose_menu_data.icon ? choose_menu_data.icon:'',
+      'node_radio_data.role': choose_menu_data.is_top === 1 ? 1 : 2
+    });
+
+    console.log(choose_menu_data);
+
+    this.setState({
+      curSelectNodeID:choose_menu_data.path,
+      curSelectNodeName:choose_menu_data.name,
+      isAdd: false,
+      curSelectKey:selectedKeys,
+      curSelectMenuData:choose_menu_data
+    });
 
   };
 
@@ -128,7 +170,7 @@ class node_setting extends Component {
 
   /*dom结构渲染*/
   render() {
-    const { nodeList, currentNodeIndex } = this.state;
+    const { nodeList, currentNodeIndex ,curSelectKey } = this.state;
     const { authority, menuData } = this.props;
 
     // 将嵌套菜单数据扁平化
@@ -136,12 +178,6 @@ class node_setting extends Component {
 
     // 表单
     const { getFieldDecorator,setFieldsValue } = this.props.form;
-
-    // this.props.form.setFieldsValue({
-    //     "is_menu":this.state.node_radio_data.menu,
-    //     "node_role":this.state.node_radio_data.role,
-    //     "node_state":this.state.node_radio_data.status
-    // })
 
     // FormLayout
     const formItemLayout = {
@@ -169,15 +205,53 @@ class node_setting extends Component {
 
     /*新增节点*/
     const newNode = () => {
-
+      const {setFieldsValue} = this.props.form;
+      setFieldsValue({
+          "node_name":'',
+          "node_url":'',
+          "node_sort":'',
+          "node_icon":'',
+          "is_menu":this.state.node_radio_data.menu,
+          "node_role":this.state.node_radio_data.role,
+          "node_state":this.state.node_radio_data.status
+      });
+      this.setState({
+        isAdd:true,
+        curSelectNodeID:'',
+        curSelectNodeName:'',
+      })
     };
 
     /*删除节点*/
     const deleteNode = () => {
-
+      const { dispatch } = this.props;
+      const { curSelectNodeID, curSelectNodeName} = this.state;
+      if(!curSelectNodeID){
+        message.error('请选择需要删除的节点');
+      }else{
+        Modal.confirm({
+          title: '删除节点',
+          content: `是否删除 '${curSelectNodeName}' 节点`,
+          okText: '确认',
+          cancelText: '取消',
+          onOk: ()=>{
+            dispatch({
+              type:'authority/editMenuNode',
+              payload:{
+                menu_id:curSelectNodeID
+              },
+              callback:(res)=>{
+                if(res.state===1){
+                  message.success('删除节点成功');
+                }else{
+                  message.error(authority.modifyState.msg)
+                }
+              }
+            })
+          },
+        });
+      }
     };
-
-
 
     return (
       <PageHeaderWrapper title="节点设置">
@@ -193,9 +267,9 @@ class node_setting extends Component {
               </div>
 
               <DirectoryTree
-                multiple
                 onSelect={this.onSelect}
                 onExpand={this.onExpand}
+                selectedKeys={curSelectKey}
                 switcherIcon=''
               >
                 {this.getNavMenuItems(menuData)}

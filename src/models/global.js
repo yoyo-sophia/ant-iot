@@ -131,17 +131,13 @@ export default {
   subscriptions: {
     setup({ history }) {
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
-      // 类似vue的路由处理
       return history.listen(({ pathname, search }) => {
-        if(localStorage.getItem('token')){
-          window.location.href = '/dashboard/analysis'
+        if(!localStorage.getItem('token') && pathname !== '/user/login'){
+          window.location.href = '/user/login'
         }
-        // else{
-        //   window.location.href = '/user/login'
+        // if (typeof window.ga !== 'undefined') {
+        //   window.ga('send', 'pageview', pathname + search);
         // }
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search);
-        }
       });
     },
   },

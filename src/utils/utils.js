@@ -208,7 +208,6 @@ export const importCDN = (url, name) =>
 
 export function token(params) {
   (JSON.stringify(params) !== "{}") ? params : params = {};
-  // if (JSON.stringify(params) !== '{}') {
   let paramsBak = {};
   for (var i in params) {
     if (Object.prototype.toString.call(params[i]) !== "[object Undefined]" && Object.prototype.toString.call(params[i]) !== "[object Null]") {
@@ -226,5 +225,16 @@ export function token(params) {
   str = sha1(str);
   str = md5(str);
   return str;
-  // }
+}
+
+// 获取当前路径
+export function GetUrlRelativePath() {
+  let url = document.location.toString(),
+    arrUrl = url.split("//"),
+    start = arrUrl[1].indexOf("/"),
+    relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+  if (relUrl.indexOf("?") !== -1) {
+    relUrl = relUrl.split("?")[0];
+  }
+  return relUrl;
 }

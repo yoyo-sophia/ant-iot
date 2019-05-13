@@ -1,5 +1,6 @@
 import { stringify } from 'qs';
-import request from '@/utils/request';
+import OriginalRequest from '@/utils/request';
+import request from '@/utils/newRequest'
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -130,7 +131,14 @@ export async function getFakeCaptcha(mobile) {
 
 
 export async function getMockMenu() {
-  return request('/api/menu');
+  return OriginalRequest('/api/menu');
+}
+
+
+export async function getMenu() {
+  return request('/iot/v1/partners/menu_list',{
+    method:'GET'
+  })
 }
 
 
@@ -162,12 +170,14 @@ export async function getMockMenu() {
 
 // 获取标识符
 export async function getUniqueToken() {
-  return request('/iot/unique')
+  return request('/iot/unique',{
+    method:'GET'
+  })
 }
 
 // 获取图文验证码
 export async function getLoginCode(payload) {
-  return request (`/iot/code_img?${stringify(payload)}`,{
+  return request ('/iot/code_img',{
     method:'GET',
     payload:payload
   })
@@ -189,10 +199,67 @@ export async function iotLogout() {
    })
 }
 
+/*
+* end Login
+* */
 
 
 /*
-* end Login
+* 菜单设置
+* */
+
+// 添加节点
+export async function createMenuNode(payload) {
+  return request('/iot/v1/menus/create',{
+    method:'POST',
+    body:payload
+  })
+}
+
+// 修改节点
+export async function editMenuNode(payload) {
+  return request('/iot/v1/menus/update',{
+    method:'POST',
+    body:payload
+  })
+}
+
+// 删除节点
+export async function deleteMenuNode(payload) {
+  return request('/iot/v1/menus/delete',{
+    method:'POST',
+    body:payload
+  })
+}
+
+// 菜单配置API
+export async function settingMenuApi(payload) {
+  return request('/iot/v1/menus/rule/allocation',{
+    method:'POST',
+    body:payload
+  })
+}
+
+// 移除菜单中的API
+export async function deleteMenuApi(payload) {
+  return request('/iot/v1/menus/rule/remove',{
+    method:'POST',
+    body:payload
+  })
+}
+
+// 获取菜单API接口列表
+
+export async function getMenuApiList(payload) {
+  return request('/iot/v1/menus/rule_list',{
+    method:'GET',
+    payload:payload
+  })
+}
+
+
+/*
+* end 菜单设置
 * */
 
 

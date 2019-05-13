@@ -5,8 +5,16 @@ import {
   // 角色操作相关
   deleteRole, // 移除角色
   editRole, // 编辑角色
-  dispatchAuthorityToRole, //分配角色权限
+  dispatchAuthorityToRole, // 分配角色权限
   getCurRoleAuthority, // 获取当前角色权限
+
+  // 节点相关操作
+  createMenuNode, // 创建节点
+  editMenuNode, // 编辑节点
+  deleteMenuNode, // 删除节点
+  settingMenuApi, // 配置菜单API
+  deleteMenuApi, // 移除菜单API
+  getMenuApiList, // 获取菜单API列表
 
 } from '@/services/api';
 
@@ -16,16 +24,16 @@ export default {
     data: {
       list: [],
       pagination: {},
-    },
+    },// 账号列表
     accountDetailData:{
         list: [],
         pagination: {},
 
-    },
+    },// 账号详情
     roleData:{
       list:[],
       pagination:{},
-    },
+    },// 角色详情
     deleteRole:{},
     editRole:{},
     dispatchRole:{},
@@ -85,6 +93,29 @@ export default {
       const response = yield call(getCurRoleAuthority,payload);
       callback(response);
     },//获取角色列表当前拥有的权限
+
+    /*
+    * 节点相关
+    * */
+    *createMenuNode({payload,callback},{call,put}){
+      const response = yield call(createMenuNode,payload);
+      callback(response);
+    },// 创建节点
+    *editMenuNode({payload},{call,put}){
+      const response = yield call(editMenuNode,payload);
+      yield put({
+        type:'saveManipulationNode',
+        payload:response
+      })
+    },// 修改节点
+    *deleteMenuNode({payload},{call,put}){
+      const response = yield call(deleteMenuNode,payload);
+      yield put({
+        type:'saveManipulationNode',
+        payload:response
+      })
+    },// 删除节点
+
   },
   reducers: {
     /*
@@ -130,5 +161,16 @@ export default {
         dispatchRole:action.payload,
       }
     }, // 给角色分配权限
+
+    /*
+    * 节点相关
+    * */
+    saveManipulationNode(state,action){
+      return{
+        ...state,
+        modifyState:action.payload
+      }
+    }
+
   }
 }
