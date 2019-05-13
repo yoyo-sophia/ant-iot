@@ -1,8 +1,10 @@
 import {
-  getRoleList,
+  // 账号相关
   getAccountList,
   getAccountDetail,
   // 角色操作相关
+  getRoleList, // 获取角色列表
+  addRole, // 新增角色
   deleteRole, // 移除角色
   editRole, // 编辑角色
   dispatchAuthorityToRole, // 分配角色权限
@@ -108,12 +110,13 @@ export default {
         payload:response
       })
     },// 修改节点
-    *deleteMenuNode({payload},{call,put}){
+    *deleteMenuNode({payload,callback},{call,put}){
       const response = yield call(deleteMenuNode,payload);
       yield put({
         type:'saveManipulationNode',
         payload:response
-      })
+      });
+      callback(response);
     },// 删除节点
 
   },

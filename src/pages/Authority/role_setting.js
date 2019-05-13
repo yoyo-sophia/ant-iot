@@ -145,9 +145,10 @@ const DispatchAuthority = (props) => {
 };
 
 
-@connect(({ menu: menuModel, authority, loading }) => ({
-  menuData: menuModel.menuData,
+@connect(({ menu, authority, user,loading }) => ({
+  menuData: menu.menuData,
   authority,
+  userInfo:user.currentUser,
   loading: loading.models.authority
 }))
 
@@ -205,9 +206,12 @@ class roleSetting extends Component {
   ];
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch,userInfo } = this.props;
     dispatch({
-      type: "authority/fetch_role_list"
+      type: "authority/fetch_role_list",
+      payload:{
+        authority_id:userInfo.authority_list[0].authority_id
+      }
     });
   }
 
@@ -315,7 +319,7 @@ class roleSetting extends Component {
   /*
   * flag 是否显示弹窗
   * data 需要修改的数据
-  * isEdit 当前为修改数据还是新增数据
+  * isEdit 当前为修改数据还是新增数据 1：修改数据 2：新增数据
   * */
   handleModalVisible = (flag, data) => {
     if (flag && data) {
@@ -339,16 +343,40 @@ class roleSetting extends Component {
     });
   };
 
+  // 创建或修改角色
   handleAdd = fields => {
     const { dispatch } = this.props;
-    dispatch({
-      type: "rule/add",
-      payload: {
-        desc: fields.desc
-      }
-    });
-    message.success("添加成功");
-    this.handleModalVisible();
+    const { editRoleData } = this.state;
+    let _this = this;
+
+    console.log(fields);
+
+    // 创建（编辑）角色
+    if(editRoleData.isEdit === 1){
+      // 编辑角色
+
+
+    }else if(editRoleData.isEdit === 2){
+      // 新增角色
+      dispatch({
+        type: "rule/add",
+        payload: {
+          desc: fields.desc,
+          name: fields.name
+        },
+        callback:(res)=>{
+          if(res.state===1){
+            _this.handleModalVisible();
+            message.success("添加成功");
+          }else{
+            message.error(res.msg);
+          }
+        }
+      });
+    }
+
+
+
   };
 
   render() {

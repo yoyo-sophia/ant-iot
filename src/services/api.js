@@ -164,6 +164,7 @@ export async function getMenu() {
 * iot 测试环境
 * */
 
+
 /*
 * About Login
 * */
@@ -198,11 +199,6 @@ export async function iotLogout() {
      method:'GET'
    })
 }
-
-/*
-* end Login
-* */
-
 
 /*
 * 菜单设置
@@ -256,31 +252,9 @@ export async function getMenuApiList(payload) {
     payload:payload
   })
 }
-
-
 /*
 * end 菜单设置
 * */
-
-
-
-
-
-
-/*
-* 获取套餐接口
-* */
-export async function planList(params) {
-  return request(`/iot/v1/plans?${stringify(params.params)}`);
-}
-
-/*
-* 卡详情
-* */
-export async function cardList() {
-  return request(`/iot/v1/cards/new_list`);
-}
-
 
 
 /*
@@ -288,13 +262,26 @@ export async function cardList() {
 * */
 
 // 角色列表
-export async function getRoleList() {
-  return request('/api/role/list');
+export async function getRoleList(params) {
+  return request('/iot/v1/authorities/menu_list',{
+    method:'GET',
+    payload:params
+  });
+}
+
+// 新增角色
+export async function addRole(params) {
+  return request('/iot/v1/authorities/create',{
+    method:'POST',
+    body: {
+      ...params,
+    },
+  })
 }
 
 // 删除角色
 export async function deleteRole(params) {
-  return request('/api/deleteRole', {
+  return request('/iot/v1/authorities/delete', {
     method: 'POST',
     body: {
       ...params,
@@ -304,7 +291,7 @@ export async function deleteRole(params) {
 
 // 编辑角色
 export async function editRole(params) {
-  return request('/api/editRole', {
+  return request('/v1/authorities/update', {
     method: 'POST',
     body: {
       ...params,
@@ -324,7 +311,10 @@ export async function dispatchAuthorityToRole(params) {
 
 // 获取当前角色的权限列表
 export async function getCurRoleAuthority(params) {
-  return request('/api/getCurRoleAuthority');
+  return request('/iot/v1/authorities/menu_list',{
+    method:'GET',
+    payload:params
+  });
 }
 
 
