@@ -346,10 +346,9 @@ class roleSetting extends Component {
 
   // 创建或修改角色
   handleAdd = fields => {
-    const { dispatch } = this.props;
+    const { dispatch,  authority, } = this.props;
     const { editRoleData } = this.state;
     let _this = this;
-
     // 创建（编辑）角色
     if (editRoleData.isEdit) {
       // 编辑角色
@@ -360,13 +359,21 @@ class roleSetting extends Component {
           description: fields.description,
           name: fields.name
         },
-        callback: (res) => {
-          if (res.state === 1) {
-            message.success("添加成功");
-            _this.handleModalVisible();
-          } else {
-            message.error(res.msg);
-          }
+      }).then(()=>{
+        if(authority.editedRole.state===1){
+          message.success('修改数据成功');
+          _this.handleModalVisible();
+          // 刷新表格
+          console.log(authority);
+          dispatch({
+            type: "authority/fetch_role_list",
+            payload: {
+              limit: authority.roleData.data.pagination.page_size,
+              offset: authority.roleData.data.pagination.current
+            },
+          });
+        }else{
+          message.error(authority.editedRole.msg);
         }
       });
 

@@ -33,14 +33,18 @@ export default {
       data: [],
       pagination: {},
     },// 账号列表
+
     accountDetailData:{
         data: [],
         pagination: {},
     },// 账号详情
+
     roleData:{
       data:[],
       pagination:{},
     },// 角色详情
+
+    editedRole:'', //修改编辑后的数据
   },
   effects:{
     /*
@@ -88,7 +92,11 @@ export default {
     },// 删除角色
     *edit_role({payload,callback},{call,put}){
       const response = yield call(editRole,payload);
-      callback(response);
+      yield put({
+        type:'saveEditRole',
+        payload:response
+      })
+      // callback(response);
 
     },// 编辑角色
     *dispatch_authority_to_role({payload,callback},{call,put}){
@@ -171,6 +179,13 @@ export default {
         },
       }
     }, // 角色列表
+    saveEditRole(state,action){
+      return{
+        ...state,
+        editedRole:action.payload
+      }
+    },
+
     /*
     * 节点相关
     * */
