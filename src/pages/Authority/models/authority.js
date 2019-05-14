@@ -1,7 +1,7 @@
 import {
   // 账号相关
-  getAccountList,// 获取账号列表
-  getAccountDetail,
+  getAccountList, // 获取账号列表
+  getAccountDetail, // 获取账号详情
   createTopAccount, // 创建顶级账号
   dispatchRoleToAccount, // 给账号分配角色
 
@@ -29,20 +29,40 @@ import {
 export default {
   namespace:'authority',
   state:{
-    accountData: {},// 账号列表
-    accountDetailData:{},// 账号详情
-    roleData:{},// 角色详情
+    accountData: {
+      data:{
+        rows:[],
+        pagination:{},
+      }
+    },// 账号列表
+    accountDetailData:{
+      data:{
+        rows:[],
+      }
+    },// 账号权限详情列表,
+    saveCreateAccount:'',// 创建账号后保存数据
+    roleData:{
+      data:{
+        rows:[],
+        pagination:{},
+      }
+    },// 角色详情
+    allRoleList:{
+      data:{
+        rows:[],
+      }
+    },// 账号分配角色中的所有角色数据
     editedRole:'', //修改编辑后的数据
   },
   effects:{
     /*
     * 账号相关
     * */
-    *fetch({ payload }, { call, put }) {
+    *fetch_account_list({ payload }, { call, put }) {
       const response = yield call(getAccountList, payload);
       yield put({
         type: 'save',
-        payload: response.data,
+        payload: response,
       });
     },// 权限列表
     *fetch_account_detail({payload},{call,put}){
@@ -54,7 +74,10 @@ export default {
     },// 账号权限详情
     *create_top_account({payload,callback},{call,put}){
       const response = yield call(createTopAccount,payload);
-      callback(response)
+      yield put({
+        type:'saveCreateAccount',
+        payload:response
+      })
     },//创建顶级账号
     *dispatch_role_to_account({payload,callback},{call,put}){
       const response = yield call(dispatchRoleToAccount,payload);
@@ -65,10 +88,17 @@ export default {
     * */
     *fetch_role_list({payload,callback},{call,put}){
       const response = yield call(getRoleList,payload);
-      yield put({
-        type:'saveRoleList',
-        payload:response
-      });
+      if(payload){
+        yield put({
+          type:'saveRoleList',
+          payload:response
+        });
+      }else{
+        yield put({
+          type:'saveAllRoleList',
+          payload:response
+        });
+      };
     },// 角色列表
     *add_role({payload,callback},{call,put}){
       const response = yield call(addRole,payload);
@@ -146,15 +176,35 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,// 账号列表
+        accountData:{
+          ...action.payload
+        },// 账号列表
       };
     },
     saveAccountDetail(state,action){
       return{
         ...state,
-        accountDetailData: action.payload,
+        accountDetailData: {
+          data:{
+            rows:action.payload.data,
+          }
+        },
       }
     }, // 账号列表详情
+    saveCreateAccount(state,action){
+      return{
+        ...state,
+        saveCreateAccount:action.payload
+      }
+    },// 创建账号
+    saveAllRoleList(state,action){
+      return{
+        ...state,
+        allRoleList:{
+          ...action.payload
+        }
+      }
+    }, // 所有角色
 
     /*
     * 角色相关

@@ -14,11 +14,8 @@ import {
   message,
   Tree
 } from "antd";
-
 import StandardTable from "@/components/StandardTable";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
-import { arrayIntersection } from "../../utils/utils";
-
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -115,7 +112,6 @@ const DispatchAuthority = (props) => {
   const onExpand = (expandedKeys, e) => {
     console.log("onExpand", expandedKeys);
     console.log(e);
-
   };
 
   const onSelect = (selectedKeys, info) => {

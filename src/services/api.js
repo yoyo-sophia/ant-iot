@@ -292,8 +292,12 @@ export async function getAccountList(params) {
   });
 }
 
-export async function getAccountDetail() {
-  
+// 账号权限详情
+export async function getAccountDetail(params) {
+  return request('/iot/v1/partners/menu_list',{
+    method:'GET',
+    payload:params
+  })
 }
 
 //创建顶级账号

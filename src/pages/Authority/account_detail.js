@@ -7,13 +7,14 @@ import StandardTable from "@/components/StandardTable";
 
 @connect(({ authority, loading }) => ({
   authority,
-  loading: loading.models.authority
+  tableLoading: loading.effects['authority/fetch_account_detail']
 }))
 
 class account_detail extends Component {
 
   state = {
     selectedRows:[],
+    curPartnerMenuList:[],
   };
 
   columns = [{
@@ -34,22 +35,39 @@ class account_detail extends Component {
     dispatch({
       type:'authority/fetch_account_detail',
       payload:{
-        id:detail_id
+        partner_id:detail_id
       }
     })
   };
 
+  // 获取当前角色已有权限---扁平化数组
+  getItem = (data) => {
+    data.map(item => {
+      if (!item.children) {
+        this.state.curPartnerMenuList.push(item);
+      } else {
+        this.state.curPartnerMenuList.push(item);
+        this.getItem(item.children);
+      }
+    });
+  };
+
   render() {
-    const { authority:{accountDetailData}, loading } = this.props;
+    const { authority:{accountDetailData}, tableLoading } = this.props;
     const { selectedRows } = this.state;
+
+    // 过滤table数据
+    let filterAccountDetail = accountDetailData.data.rows.length ? this.getItem(accountDetailData.data.rows).filter(item => !item.is_top) : [];
+
+    console.log(filterAccountDetail);
 
     return (
       <PageHeaderWrapper title="账号权限详情">
         <Card>
           <StandardTable
             selectedRows={selectedRows}
-            loading={loading}
-            data={accountDetailData}
+            loading={tableLoading}
+            data={accountDetailData.data}
             columns={this.columns}
           />
         </Card>
