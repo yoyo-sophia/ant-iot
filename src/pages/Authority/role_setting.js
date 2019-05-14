@@ -389,14 +389,23 @@ class roleSetting extends Component {
           if (res.state === 1) {
             message.success("添加成功");
             _this.handleModalVisible();
+            // 刷新表格
+            let tableParam = this.state.initialPagination;
+            authority.roleData.data.pagination ? tableParam.pageSize = authority.roleData.data.pagination.page_size : tableParam;
+            dispatch({
+              type: "authority/fetch_role_list",
+              payload: {
+                limit:tableParam.pageSize || tableParam.page_size,
+                offset:tableParam.current
+              },
+            });
+
           } else {
             message.error(res.msg);
           }
         }
       });
     }
-
-
   };
 
   // 给角色分配权限选择

@@ -29,21 +29,9 @@ import {
 export default {
   namespace:'authority',
   state:{
-    accountData: {
-      data: [],
-      pagination: {},
-    },// 账号列表
-
-    accountDetailData:{
-        data: [],
-        pagination: {},
-    },// 账号详情
-
-    roleData:{
-      data:[],
-      pagination:{},
-    },// 角色详情
-
+    accountData: {},// 账号列表
+    accountDetailData:{},// 账号详情
+    roleData:{},// 角色详情
     editedRole:'', //修改编辑后的数据
   },
   effects:{
