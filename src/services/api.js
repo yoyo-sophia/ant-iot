@@ -135,27 +135,6 @@ export async function getMockMenu() {
 }
 
 
-export async function getMenu() {
-  return request('/iot/v1/partners/menu_list',{
-    method:'GET'
-  })
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -164,6 +143,13 @@ export async function getMenu() {
 * iot 测试环境
 * */
 
+
+// 菜单数据
+export async function getMenu() {
+  return request('/iot/v1/partners/menu_list',{
+    method:'GET'
+  })
+}
 
 /*
 * About Login
@@ -228,37 +214,13 @@ export async function deleteMenuNode(payload) {
   })
 }
 
-// 菜单配置API
-export async function settingMenuApi(payload) {
-  return request('/iot/v1/menus/rule/allocation',{
-    method:'POST',
-    body:payload
-  })
-}
-
-// 移除菜单中的API
-export async function deleteMenuApi(payload) {
-  return request('/iot/v1/menus/rule/remove',{
-    method:'POST',
-    body:payload
-  })
-}
-
-// 获取菜单API接口列表
-
-export async function getMenuApiList(payload) {
-  return request('/iot/v1/menus/rule_list',{
-    method:'GET',
-    payload:payload
-  })
-}
 /*
 * end 菜单设置
 * */
 
 
 /*
-*  权限相关接口
+*  角色相关
 * */
 
 // 角色列表
@@ -291,7 +253,7 @@ export async function deleteRole(params) {
 
 // 编辑角色
 export async function editRole(params) {
-  return request('/v1/authorities/update', {
+  return request('/iot/v1/authorities/update', {
     method: 'POST',
     body: {
       ...params,
@@ -318,17 +280,71 @@ export async function getCurRoleAuthority(params) {
 }
 
 
+/*
+* 账号相关
+* */
+
 // 账号列表
 export async function getAccountList(params) {
-  return request(`/api/account/list?${stringify({
-    id:params.id
-  })}`);
+  return request('/iot/v1/partners/partner_list',{
+    method:'GET',
+    payload:params
+  });
 }
 
-// 账号权限详情列表
-export async function getAccountDetail(params) {
-  return request(`/api/account/detail?${stringify({
-    id:params.id
-  })}`);
+export async function getAccountDetail() {
+  
 }
+
+//创建顶级账号
+export async function createTopAccount(params) {
+  return request('/iot/v1/partners/create_top',{
+    method:'POST',
+    body:params
+  })
+}
+// 给账号分配角色
+export async function dispatchRoleToAccount(params) {
+  return request('/iot/v1/authorities/authority/allocation',{
+    method:'POST',
+    body:params
+  })
+}
+
+/*
+* 接口设置相关
+* */
+
+// 获取接口列表
+export async function apiList(params) {
+  return request('/iot/v1/rules/list',{
+    method:'GET',
+    payload:params
+  })
+}
+
+// 为菜单配置接口
+export async function dispatchApiToMenu(params) {
+  return request('/iot/v1/menus/rule/allocation',{
+    method:'POST',
+    body:params
+  })
+}
+
+// 当前菜单已有api列表
+export async function getMenuCurApi(params) {
+  return request('/iot/v1/menus/rule_list',{
+    method:'GET',
+    payload:params
+  })
+}
+
+// 移除当前菜单中的api
+export async function deleteMenuApi(params) {
+  return request('/iot/v1/menus/rule/remove',{
+    method:'POST',
+    body:params
+  })
+}
+
 

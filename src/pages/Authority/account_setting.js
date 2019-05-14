@@ -55,7 +55,7 @@ const CreateForm = Form.create()((props) => {
 
 @connect(({ authority, loading }) => ({
   authority,
-  loading: loading.models.authority
+
 }))
 
 class account_setting extends Component {
@@ -109,9 +109,7 @@ class account_setting extends Component {
     render: (text, record) => (
       <Button type={record.status === 0 ? "primary" : ""}>{record.status === 0 ? "关闭" : "开启"}</Button>
     )
-  }
-    , {
-      // dataIndex:'operate',
+  }, {
       title: "操作",
       render: (text, record) => (
         <Fragment>
@@ -153,6 +151,10 @@ class account_setting extends Component {
   render() {
     const { authority: { accountDetailData }, loading } = this.props;
     const { selectedRows, roleLists, roleInitialLists, modalVisible } = this.state;
+
+    const tableLoading = {
+      loading:loading.effects['authority/']
+    }; // 表格加载loading
 
     // 分配角色参数数据
     const dispatchMethod = {

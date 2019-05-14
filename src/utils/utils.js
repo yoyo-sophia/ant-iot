@@ -15,6 +15,25 @@ function objKeySort(obj) {
   return newObj;
 }//排序参数
 
+export function arrayIntersection( a, b )
+{
+  var ai=0, bi=0;
+  var result = new Array();
+  while ( ai < a.length && bi < b.length )
+  {
+    if      ( a[ai] < b[bi] ) { ai++; }
+    else if ( a[ai] > b[bi] ) { bi++; }
+    else /* they're equal */
+    {
+      result.push ( a[ai] );
+      ai++;
+      bi++;
+    }
+  }
+  return result;
+}
+
+
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
 }
@@ -207,24 +226,30 @@ export const importCDN = (url, name) =>
 
 
 export function token(params) {
-  (JSON.stringify(params) !== "{}") ? params : params = {};
-  let paramsBak = {};
-  for (var i in params) {
-    if (Object.prototype.toString.call(params[i]) !== "[object Undefined]" && Object.prototype.toString.call(params[i]) !== "[object Null]") {
-      paramsBak[i] = params[i];
+    (Object.prototype.toString.call(params) === "[object Object]") ? params : params = {};
+    let paramsBak = {};
+    for (var i in params) {
+      if (Object.prototype.toString.call(params[i]) !== "[object Undefined]" &&
+        Object.prototype.toString.call(params[i]) !== "[object Null]" &&
+        Object.prototype.toString.call(params[i]) !== "[object Array]") {
+        paramsBak[i] = params[i];
+      }else if(Object.prototype.toString.call(params[i]) === '[object Array]'){
+        paramsBak[i] = JSON.stringify(params[i]);
+      }
     }
-  }
-  paramsBak.salt = "qhyl@#6688";
-  let sortParams = objKeySort(paramsBak);
-  let str = "";
-  for (let i in sortParams) {
-    str += `${i}=${sortParams[i]}&`;
-  }
-  str = str.substr(0, str.length - 1);
+    paramsBak.salt = "qhyl@#6688";
 
-  str = sha1(str);
-  str = md5(str);
-  return str;
+    let sortParams = objKeySort(paramsBak);
+    let str = "";
+    for (let i in sortParams) {
+      str += `${i}=${sortParams[i]}&`;
+    }
+    str = str.substr(0, str.length - 1);
+
+    str = sha1(str);
+    str = md5(str);
+
+    return str;
 }
 
 // 获取当前路径

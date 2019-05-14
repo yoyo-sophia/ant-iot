@@ -1,7 +1,10 @@
 import {
   // 账号相关
-  getAccountList,
+  getAccountList,// 获取账号列表
   getAccountDetail,
+  createTopAccount, // 创建顶级账号
+  dispatchRoleToAccount, // 给账号分配角色
+
   // 角色操作相关
   getRoleList, // 获取角色列表
   addRole, // 新增角色
@@ -14,29 +17,30 @@ import {
   createMenuNode, // 创建节点
   editMenuNode, // 编辑节点
   deleteMenuNode, // 删除节点
-  settingMenuApi, // 配置菜单API
-  deleteMenuApi, // 移除菜单API
-  getMenuApiList, // 获取菜单API列表
+
+  // api接口设置相关
+  apiList, // 所有接口列表
+  dispatchApiToMenu, // 给菜单设置接口
+  getMenuCurApi, // 当前菜单已有api列表
+  deleteMenuApi, // 移除当前菜单中的api
 
 } from '@/services/api';
 
 export default {
   namespace:'authority',
   state:{
-    data: {
-      list: [],
+    accountData: {
+      data: [],
       pagination: {},
     },// 账号列表
     accountDetailData:{
-        list: [],
+        data: [],
         pagination: {},
-
     },// 账号详情
     roleData:{
       data:[],
       pagination:{},
     },// 角色详情
-    dispatchRole:{},
   },
   effects:{
     /*
@@ -56,7 +60,14 @@ export default {
         payload:response,
       });
     },// 账号权限详情
-
+    *create_top_account({payload,callback},{call,put}){
+      const response = yield call(createTopAccount,payload);
+      callback(response)
+    },//创建顶级账号
+    *dispatch_role_to_account({payload,callback},{call,put}){
+      const response = yield call(dispatchRoleToAccount,payload);
+      callback(response);
+    },
     /*
     * 角色相关
     * */
@@ -112,6 +123,25 @@ export default {
       callback(response);
     },// 删除节点
 
+    /*
+    * api接口
+    * */
+    *get_api_list({payload,callback},{call,put}){
+      const response = yield call(apiList);
+      callback(response);
+    },// 获取api列表
+    *dispatch_api_to_menu({payload,callback},{call,put}){
+      const response = yield call(dispatchApiToMenu);
+      callback(response);
+    },// 给菜单分配api
+    *get_menu_cur_api({payload,callback},{call,put}){
+      const response = yield call(getMenuCurApi);
+      callback(response)
+    },// 获取子节点api列表
+    *delete_menu_api({payload,callback},{call,put}){
+      const response = yield call(deleteMenuApi);
+      callback(response);
+    },// 移除菜单api
   },
   reducers: {
     /*

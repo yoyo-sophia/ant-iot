@@ -67,6 +67,7 @@ axios.interceptors.response.use(function(response) {
   }
 
   const errorText = codeMessage[error.response.status] || error.response.statusText;
+  console.log(error);
   notification.error({
     message: `请求错误 ${error.response.status}: ${error.response.url}`,
     description: errorText,

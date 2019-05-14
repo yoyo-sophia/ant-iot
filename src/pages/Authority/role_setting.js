@@ -17,6 +17,7 @@ import {
 
 import StandardTable from "@/components/StandardTable";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
+import { arrayIntersection } from "../../utils/utils";
 
 
 const FormItem = Form.Item;
@@ -26,11 +27,17 @@ const confirm = Modal.confirm;
 
 // 新增或编辑角色
 const ManipulationRole = Form.create()((props) => {
-  const { modalVisible, form, handleAdd, handleModalVisible, editRoleData } = props;
+  const {
+    modalVisible,
+    form,
+    handleAdd,
+    handleModalVisible,
+    editRoleData
+  } = props;
   const okHandle = () => {
     form.validateFields((err, fieldValue) => {
       if (err) return;
-      form.resetFields();
+      // form.resetFields();
       handleAdd(fieldValue);
     });
   };
@@ -46,15 +53,15 @@ const ManipulationRole = Form.create()((props) => {
           initialValue: editRoleData.name,
           rules: [{
             required: true,
-            message:'请输入角色名称'
+            message: "请输入角色名称"
           }]
         })(<Input placeholder="请输入角色名称"/>)}
       </FormItem>
 
       <FormItem labelCol={{ span: 6 }} wrapperCol={{ span: 15 }} label="角色描述">
-        {form.getFieldDecorator("describe", {
-          initialValue: editRoleData.describe,
-          rules: [{ required: true,message:'请输入角色描述'}]
+        {form.getFieldDecorator("description", {
+          initialValue: editRoleData.description,
+          rules: [{ required: true, message: "请输入角色描述" }]
         })(<Input placeholder="请输入角色描述"/>)}
       </FormItem>
 
@@ -137,10 +144,10 @@ const DispatchAuthority = (props) => {
 };
 
 
-@connect(({ menu, authority, user,loading }) => ({
+@connect(({ menu, authority, user, loading }) => ({
   menuData: menu.menuData,
   authority,
-  userInfo:user.currentUser,
+  userInfo: user.currentUser,
   loading: loading
 }))
 
@@ -158,50 +165,52 @@ class roleSetting extends Component {
     editRoleData: {
       name: "",
       description: "",
-      isEdit: false,
+      isEdit: false
     },
     /*
     * 权限分配相关参数
     * */
+    subNodeList: null, // 后台结束菜单id合集
+    selectedRoleMenudIdList:[],// 当前选中角色所所拥有权限的id
     showAuthorityModal: false,
     defaultSelectedKeys: [],
-    roleListSelectedRow:{},
+    roleListSelectedRow: {},
     /*
     * 表格数据
     * */
-    initialPagination:{
-      current:1,
-      pageSize:10,
+    initialPagination: {
+      current: 1,
+      pageSize: 10
     }
   };
 
   columns = [{
-      dataIndex: "id",
-      title: "ID"
-    }, {
-      dataIndex: "name",
-      title: "角色名称"
-    }, {
-      dataIndex: "description",
-      title: "角色描述"
-    }, {
-      dataIndex: "count",
-      title: "角色成员数量"
-    }, {
-      // dataIndex:'operate',
-      title: "操作",
-      render: (text, record) => (
-        <Fragment>
-          <a onClick={() => this.showAuthorityModal(true, record)}>分配权限</a>
-          <Divider type="vertical"/>
-          <a onClick={() => this.handleModalVisible(true, record)}>编辑</a>
-          <Divider type="vertical"/>
-          <a onClick={() => this.removeRole(record)}>移除</a>
-          <Divider type="vertical"/>
-          <a onClick={() => this.checkRolePartnerDetail(record.id)}>查看</a>
-        </Fragment>
-      )
-    }
+    dataIndex: "id",
+    title: "ID"
+  }, {
+    dataIndex: "name",
+    title: "角色名称"
+  }, {
+    dataIndex: "description",
+    title: "角色描述"
+  }, {
+    dataIndex: "count",
+    title: "角色成员数量"
+  }, {
+    // dataIndex:'operate',
+    title: "操作",
+    render: (text, record) => (
+      <Fragment>
+        <a onClick={() => this.showAuthorityModal(true, record)}>分配权限</a>
+        <Divider type="vertical"/>
+        <a onClick={() => this.handleModalVisible(true, record)}>编辑</a>
+        <Divider type="vertical"/>
+        <a onClick={() => this.removeRole(record)}>移除</a>
+        <Divider type="vertical"/>
+        <a onClick={() => this.checkRolePartnerDetail(record.id)}>查看</a>
+      </Fragment>
+    )
+  }
   ];
 
   componentDidMount() {
@@ -209,9 +218,9 @@ class roleSetting extends Component {
     const { initialPagination } = this.state;
     dispatch({
       type: "authority/fetch_role_list",
-      payload:{
-        limit:initialPagination.pageSize,
-        offset:initialPagination.current,
+      payload: {
+        limit: initialPagination.pageSize,
+        offset: initialPagination.current
       }
     });
   }
@@ -222,37 +231,41 @@ class roleSetting extends Component {
   // 分配权限Modal
   showAuthorityModal = (flag, data) => {
     if (data) {
-
-      this.setState({ roleListSelectedRow:data });
-
+      this.setState({
+        roleListSelectedRow: data,
+        selectedRoleMenudIdList: [],
+      });
       const { dispatch } = this.props;
+
       dispatch({
         type: "authority/fetch_curRole_authority",
-        payload:{
-          authority_id:data.id,
+        payload: {
+          authority_id: data.id
         },
         callback: (res) => {
-          console.log(res);
+          let menuIdList = [];
           if (res.state === 1) {
-            if(res.data.length){
+            if (res.data.length) {
+              this.getItem(res.data);
+              menuIdList = this.state.selectedRoleMenudIdList.map(item => item.menu_id);
               this.setState({
-                defaultSelectedKeys: res.data
+                defaultSelectedKeys:menuIdList
               });
             }
             this.setState({
               showAuthorityModal: !!flag
             });
 
-          }else{
-            message.error(res.msg)
+          } else {
+            message.error(res.msg);
           }
         }
       });
       // 获取当前角色权限
-    }else{
+    } else {
       this.setState({
         showAuthorityModal: !!flag
-      })
+      });
     }
   };
 
@@ -272,13 +285,13 @@ class roleSetting extends Component {
               authority_id: params.id
             },
             callback: (res) => {
-              res.state === 1 ? message.success('移除角色成功') : message.error(res.msg);
+              res.state === 1 ? message.success("移除角色成功") : message.error(res.msg);
               resolve;
-            },
+            }
           });
 
         });
-      },
+      }
     });
   };
 
@@ -296,12 +309,12 @@ class roleSetting extends Component {
     const params = {
       offset: pagination.current,
       limit: pagination.pageSize,
-      ...formValues,
+      ...formValues
     };
 
     dispatch({
-      type: 'authority/fetch_role_list',
-      payload: params,
+      type: "authority/fetch_role_list",
+      payload: params
     });
   };
   /*
@@ -316,7 +329,7 @@ class roleSetting extends Component {
       });
     } else {
       this.setState({
-        editRoleData: { name: "", describe: "", isEdit: false }
+        editRoleData: { name: "", description: "", isEdit: false }
       });
     }
     this.setState({
@@ -338,38 +351,38 @@ class roleSetting extends Component {
     let _this = this;
 
     // 创建（编辑）角色
-    if(editRoleData.isEdit){
+    if (editRoleData.isEdit) {
       // 编辑角色
       dispatch({
         type: "authority/edit_role",
         payload: {
-          authority_id:editRoleData.authority_id,
-          description: fields.describe,
+          authority_id: editRoleData.id,
+          description: fields.description,
           name: fields.name
         },
-        callback:(res)=>{
-          if(res.state===1){
+        callback: (res) => {
+          if (res.state === 1) {
             message.success("添加成功");
             _this.handleModalVisible();
-          }else{
+          } else {
             message.error(res.msg);
           }
         }
       });
 
-    }else{
+    } else {
       // 新增角色
       dispatch({
         type: "authority/add_role",
         payload: {
           name: fields.name,
-          description: fields.describe,
+          description: fields.description
         },
-        callback:(res)=>{
-          if(res.state===1){
+        callback: (res) => {
+          if (res.state === 1) {
             message.success("添加成功");
             _this.handleModalVisible();
-          }else{
+          } else {
             message.error(res.msg);
           }
         }
@@ -381,28 +394,56 @@ class roleSetting extends Component {
 
   // 给角色分配权限选择
   onCheck = (checkedKeys, e) => {
-    console.log("onCheck", checkedKeys);
-    this.setState({ defaultSelectedKeys:checkedKeys });
+    let regMainNode = /^(\d-\d)?$/,
+      menuInfoList = e.checkedNodesPositions,
+      mainNodeList = [], // 主节点id合集
+      subNodeList = []; // 子节点id合集
+
+    menuInfoList.map((item, index) => {
+      if (regMainNode.test(item.pos)) {
+        mainNodeList.push(item.node.key);
+      }
+    });
+
+    subNodeList = mainNodeList.concat(checkedKeys).filter(v => !mainNodeList.includes(v)).map(item => parseInt(item));
+
+    this.setState({
+      defaultSelectedKeys: checkedKeys,
+      subNodeList: subNodeList
+    });
   };
 
   // 分配权限确定
   submitAuthoritySetting = () => {
-    const { dispatch } =  this.props;
-    const { roleListSelectedRow ,defaultSelectedKeys } = this.state;
+    const { dispatch } = this.props;
+    const { roleListSelectedRow, subNodeList } = this.state;
     // 提交权限表单
     dispatch({
-      type:'authority/dispatch_authority_to_role',
-      payload:{
-        authority_id:roleListSelectedRow.id,
-        menu_id_list:defaultSelectedKeys,
+      type: "authority/dispatch_authority_to_role",
+      payload: {
+        authority_id: roleListSelectedRow.id,
+        menu_id_list: subNodeList
       },
-      callback:(res) =>{
-        if(res.state === 1){
+      callback: (res) => {
+        if (res.state === 1) {
+          message.success("分配权限成功");
           this.showAuthorityModal(false);
-        }else{
-          message.error(res.msg)
+        } else {
+          message.error(res.msg);
         }
-      },
+      }
+    });
+  };
+
+  // 获取当前角色已有权限---扁平化数组
+  getItem = (data) => {
+    data.map(item => {
+      if (!item.children) {
+        this.state.selectedRoleMenudIdList.push(item);
+      } else {
+        this.state.selectedRoleMenudIdList.push(item);
+        this.getItem(item.children);
+      }
     });
   };
 
@@ -413,7 +454,7 @@ class roleSetting extends Component {
       menuData
     } = this.props;
 
-    const { modalVisible, editRoleModal, defaultSelectedKeys} = this.state;
+    const { modalVisible, editRoleModal, defaultSelectedKeys } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -425,15 +466,13 @@ class roleSetting extends Component {
       showAuthorityModal: this.state.showAuthorityModal, //显隐菜单
       menuData: menuData, // 菜单数据
       defaultSelectedKeys: defaultSelectedKeys, // 权限选中数据
-      // handleEditModal: this.handleEditModal,
-      // handleModalVisible: this.handleModalVisible,
       hideDispatchAuthorityModal: this.showAuthorityModal, // 关闭弹窗
-      onCheck:this.onCheck, //权限选择操作
-      submitAuthoritySetting:this.submitAuthoritySetting,// 提交表单
+      onCheck: this.onCheck, //权限选择操作
+      submitAuthoritySetting: this.submitAuthoritySetting// 提交表单
     };
 
     const tableLoading = {
-      loading:loading.effects['authority/fetch_role_list']
+      loading: loading.effects["authority/fetch_role_list"]
     }; // 表格加载loading
 
     return (
