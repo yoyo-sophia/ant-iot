@@ -58,32 +58,32 @@ const DispatchRoleModal = Form.create()((props) => {
 });
 
 // 创建账号
-const CreateTopPartner = Form.create()((props)=>{
+const CreateTopPartner = Form.create()((props) => {
   const {
     form,
     modalVisible,
     handleModalVisible,
     submitCreateAccount,//提交数据
-    createAccountData,// 初始数据
+    createAccountData// 初始数据
   } = props;
 
-  const submit = () =>{
+  const submit = () => {
     form.validateFields((err, fieldValue) => {
       if (err) return;
       submitCreateAccount(fieldValue);
     });
   };
 
-  return(
+  return (
     <Modal
       title="创建账号"
       visible={modalVisible}
       onOk={submit}
-      onCancel={()=>handleModalVisible()}
+      onCancel={() => handleModalVisible()}
     >
       <FormItem labelCol={{ span: 6 }} wrapperCol={{ span: 15 }} label="账号名称">
         {form.getFieldDecorator("nickname", {
-          initialValue:createAccountData.nickname,
+          initialValue: createAccountData.nickname,
           rules: [{
             required: true,
             message: "请输入代理商名称"
@@ -106,7 +106,7 @@ const CreateTopPartner = Form.create()((props)=>{
       </FormItem>
 
     </Modal>
-  )
+  );
 
 
 });
@@ -116,29 +116,29 @@ const CreateTopPartner = Form.create()((props)=>{
 @connect(({ authority, user, loading }) => ({
   user,
   authority,
-  tableLoading:loading.effects['authority/fetch_account_list'],//table loading
+  tableLoading: loading.effects["authority/fetch_account_list"],//table loading
 }))
 
 class account_setting extends Component {
   state = {
     selectedRows: [],
     // 分配角色相数据
-    rowInfo:{},
-    roleLists:[], // 角色数据列表
+    rowInfo: {},
+    roleLists: [], // 角色数据列表
     roleInitialLists: [1, 3], // 当前账号已有角色数据
     modalVisible: false, // 分配角色弹窗控制参数
     // 创建账号相关参数
-    createModalVisible:false, // 创建账号弹窗控制参数
-    createAccountData:{
-      nickname:'',
-      password:'',
-      mobile:''
+    createModalVisible: false, // 创建账号弹窗控制参数
+    createAccountData: {
+      nickname: "",
+      password: "",
+      mobile: ""
     },
     // 表格相关数据
     initialPagination: {
       current: 1,
       pageSize: 10
-    },
+    }
   };
 
   componentDidMount() {
@@ -149,7 +149,7 @@ class account_setting extends Component {
       payload: {
         limit: initialPagination.pageSize,
         offset: initialPagination.current
-      },
+      }
     });
   };
 
@@ -162,17 +162,17 @@ class account_setting extends Component {
   }, {
     title: "角色",
     dataIndex: "authority_list",
-    render:(text,record) =>{
-      if(!record.authority_list.length){
-        return '-'
-      }else{
-        let roleStr = ''
-        record.authority_list.map(item=>{
-          roleStr += `${item.authority_name},`
-        })
-        return roleStr
+    render: (text, record) => {
+      if (!record.authority_list.length) {
+        return "-";
+      } else {
+        let roleStr = "";
+        record.authority_list.map(item => {
+          roleStr += `${item.authority_name},`;
+        });
+        return roleStr;
       }
-    },
+    }
   }, {
     title: "手机号码",
     dataIndex: "mobile"
@@ -180,67 +180,68 @@ class account_setting extends Component {
     title: "账号状态",
     dataIndex: "status",
     render: (text, record) => (
-      <Button type={record.status === 0 ? "primary" : ""}>{record.status === 0 ? "关闭" : "开启"}</Button>
+      <Button onClick={() => this.changeAccountStatus(record)}
+              type={record.status === 0 ? "primary" : ""}>{record.status === 0 ? "关闭" : "开启"}</Button>
     )
   }, {
-      title: "操作",
-      render: (text, record) => (
-        <Fragment>
-          <a onClick={() => this.handleRoles(true,record)}>编辑</a>
-          <Divider type="vertical"/>
-          <a onClick={() => this.checkUserRole(record)}>查看账号权限</a>
-        </Fragment>
-      )
-    }
+    title: "操作",
+    render: (text, record) => (
+      <Fragment>
+        <a onClick={() => this.handleRoles(true, record)}>编辑</a>
+        <Divider type="vertical"/>
+        <a onClick={() => this.checkUserRole(record)}>查看账号权限</a>
+      </Fragment>
+    )
+  }
   ];
 
-  // 角色分配弹窗
-
-  /* 列表操作相关 */
+  /*
+  * 列表操作相关
+  * */
 
   // 分配角色权限
-  handleRoles = (flag,rowInfo) => {
-    const { dispatch, authority, } =  this.props;
-    const { roleLists} =  this.state;
+  handleRoles = (flag, rowInfo) => {
+    const { dispatch, authority } = this.props;
+    const { roleLists } = this.state;
 
-    if(rowInfo){
-     //获取角色列表及当前账号已有角色数据
+    if (rowInfo) {
+      //获取角色列表及当前账号已有角色数据
 
       // 处理当前账号已有的角色数据
-      let curAccountRoleList = [] ;
-      if(rowInfo.authority_list.length){
-        rowInfo.authority_list.map(item=>{
+      let curAccountRoleList = [];
+      if (rowInfo.authority_list.length) {
+        rowInfo.authority_list.map(item => {
           curAccountRoleList.push(item.authority_id);
-        })
+        });
       }
       this.setState({
-        roleInitialLists:curAccountRoleList,
-        rowInfo:rowInfo,
+        roleInitialLists: curAccountRoleList,
+        rowInfo: rowInfo
       });
-      if(!roleLists.length){
-        new Promise(resolve =>{
+      if (!roleLists.length) {
+        new Promise(resolve => {
           dispatch({
-            type:'authority/fetch_role_list',
-            payload:{
+            type: "authority/fetch_role_list",
+            payload: {
               resolve
-            },
-          })
-        }).then((res)=>{
-          if(res.state === 1){
+            }
+          });
+        }).then((res) => {
+          if (res.state === 1) {
             this.setState({
-              roleLists:res.data.rows,
+              roleLists: res.data.rows,
               modalVisible: !!flag
             });
-          }else{
+          } else {
             message.error(res.msg);
           }
         });// 请求所有角色数据
-      }else{
+      } else {
         this.setState({
           modalVisible: !!flag
         });
       }
-    }else{
+    } else {
       this.setState({
         modalVisible: !!flag
       });
@@ -250,8 +251,8 @@ class account_setting extends Component {
   // 查看用户详细功能
   checkUserRole = (rowInfo) => {
     localStorage.setItem("accountAuthorityDetail", JSON.stringify({
-      id:rowInfo.id,
-      nickname:rowInfo.nickname
+      id: rowInfo.id,
+      nickname: rowInfo.nickname
     }));
     router.push("/authority/account_detail");
   };
@@ -263,36 +264,70 @@ class account_setting extends Component {
     });
   };
 
-  // 分配角色给账号
-  dispatchRoleToAccount = (params) =>{
+  // 启用或关闭账号
+  changeAccountStatus = (rowInfo) =>{
     const { dispatch, authority } = this.props;
-    const { rowInfo ,initialPagination} = this.state;
-    new Promise(resolve=>{
+    const {initialPagination} = this.state;
+    new Promise(resolve => {
       dispatch({
-        type:'authority/dispatch_role_to_account',
+        type:'authority/change_account_status',
         payload:{
           params:{
             partner_id:rowInfo.id,
-            authority_id_list:params.roleListItem,
+            status:rowInfo.status === 1 ? 0 : 1,
           },
-          resolve
-        },
+          resolve,
+        }
       });
     }).then(res=>{
       if(res.state===1){
-        if(res.state ===1){
-          message.success('分配角色成功');
+        message.success('修改账号状态成功');
+        // 刷新操作
+        dispatch({
+          type: "authority/fetch_account_list",
+          payload: {
+            limit: authority.accountData.data.pagination.page_size || initialPagination.pageSize,
+            offset: authority.accountData.data.pagination.current || initialPagination.current
+          }
+        });
+      }else {
+        message.error(res.msg);
+      }
+    });
+
+
+  };
+
+  // 分配角色给账号
+  dispatchRoleToAccount = (params) => {
+    const { dispatch, authority } = this.props;
+    const { rowInfo, initialPagination } = this.state;
+    new Promise(resolve => {
+      dispatch({
+        type: "authority/dispatch_role_to_account",
+        payload: {
+          params: {
+            partner_id: rowInfo.id,
+            authority_id_list: params.roleListItem
+          },
+          resolve
+        }
+      });
+    }).then(res => {
+      if (res.state === 1) {
+        if (res.state === 1) {
+          message.success("分配角色成功");
           this.handleModalVisible();
           // 刷新列表
           dispatch({
             type: "authority/fetch_account_list",
             payload: {
               limit: authority.accountData.data.pagination.page_size || initialPagination.pageSize,
-              offset: authority.accountData.data.pagination.current || initialPagination.current,
-            },
-          })
+              offset: authority.accountData.data.pagination.current || initialPagination.current
+            }
+          });
 
-        }else {
+        } else {
           message.error(res.msg);
         }
       }
@@ -305,31 +340,31 @@ class account_setting extends Component {
   * */
 
   // 控制创建账号弹窗
-  createAccountHandleModal = (flag) =>{
+  createAccountHandleModal = (flag) => {
     this.setState({
-      createModalVisible:!!flag,
-      createAccountData:{
-        nickname:'',
-        password:'',
-        mobile:''
+      createModalVisible: !!flag,
+      createAccountData: {
+        nickname: "",
+        password: "",
+        mobile: ""
       }
     });
   };
 
   // 创建顶级代理商确定事件
-  submitCreateAccount = (fieldValue) =>{
-    const { dispatch, authority:{ saveCreateAccount,accountData } } = this.props;
+  submitCreateAccount = (fieldValue) => {
+    const { dispatch, authority: { saveCreateAccount, accountData } } = this.props;
     const { initialPagination } = this.state;
     dispatch({
-      type:'authority/create_top_account',
-      payload:{
+      type: "authority/create_top_account",
+      payload: {
         nickname: fieldValue.nickname,
         password: fieldValue.password,
-        mobile: fieldValue.mobile,
+        mobile: fieldValue.mobile
       }
-    }).then(()=>{
-      if(saveCreateAccount.state === 1){
-        message.success('创建账号成功');
+    }).then(() => {
+      if (saveCreateAccount.state === 1) {
+        message.success("创建账号成功");
         this.createAccountHandleModal(false);
         // 刷新列表
         dispatch({
@@ -337,35 +372,35 @@ class account_setting extends Component {
           payload: {
             limit: accountData.data.pagination.page_size || initialPagination.pageSize,
             offset: 1
-          },
+          }
         });
-      }else {
+      } else {
         console.log(saveCreateAccount);
         message.error(saveCreateAccount.msg);
       }
-    })
+    });
   };
 
   // 创建顶级代理商账号
-  createTopPartner = () =>{
+  createTopPartner = () => {
     this.createAccountHandleModal(true);
   };
 
   // 创建账号按钮dom接口
-  createTopButton(){
+  createTopButton() {
     return (
       <Button type="primary" onClick={this.createTopPartner}>创建顶级代理商</Button>
-    )
+    );
   };
 
   // 创建账号
-  renderCreateButton(){
-    let currentUser = JSON.parse(localStorage.getItem('userInfo')),
-        curLoginAccountId = currentUser.authority_list[0].authority_id;
-    if(curLoginAccountId === 1){
-      return this.createTopButton()
-    }else{
-      return ''
+  renderCreateButton() {
+    let currentUser = JSON.parse(localStorage.getItem("userInfo")),
+      curLoginAccountId = currentUser.authority_list[0].authority_id;
+    if (curLoginAccountId === 1) {
+      return this.createTopButton();
+    } else {
+      return "";
     }
   };
 
@@ -386,10 +421,10 @@ class account_setting extends Component {
 
     // 创建账号相关参数
     const createAccountParams = {
-      modalVisible:this.state.createModalVisible,
-      handleModalVisible:this.createAccountHandleModal,
-      submitCreateAccount:this.submitCreateAccount,
-      createAccountData:this.state.createAccountData,
+      modalVisible: this.state.createModalVisible,
+      handleModalVisible: this.createAccountHandleModal,
+      submitCreateAccount: this.submitCreateAccount,
+      createAccountData: this.state.createAccountData
     };
 
     return (

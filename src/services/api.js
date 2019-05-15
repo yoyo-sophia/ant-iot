@@ -315,6 +315,14 @@ export async function dispatchRoleToAccount(params) {
   })
 }
 
+// 修改账号状态
+export async function changeAccountStatus(params) {
+  return request('/iot/v1/partners/update_status',{
+    method:'POST',
+    body:params,
+  })
+}
+
 /*
 * 接口设置相关
 * */

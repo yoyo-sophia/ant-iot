@@ -4,6 +4,7 @@ import {
   getAccountDetail, // 获取账号详情
   createTopAccount, // 创建顶级账号
   dispatchRoleToAccount, // 给账号分配角色
+  changeAccountStatus, // 修改账号状态
 
   // 角色操作相关
   getRoleList, // 获取角色列表
@@ -85,6 +86,12 @@ export default {
       const response = yield call(dispatchRoleToAccount,payload.params);
       resolve(response);
     },// 给账号分配角色
+    *change_account_status({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(changeAccountStatus,payload.params);
+      resolve(response);
+    },// 修改张哈状态
+
     /*
     * 角色相关
     * */
