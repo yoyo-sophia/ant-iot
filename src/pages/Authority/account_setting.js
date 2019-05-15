@@ -188,7 +188,7 @@ class account_setting extends Component {
         <Fragment>
           <a onClick={() => this.handleRoles(true,record)}>编辑</a>
           <Divider type="vertical"/>
-          <a onClick={() => this.checkUserRole(record.id)}>查看账号权限</a>
+          <a onClick={() => this.checkUserRole(record)}>查看账号权限</a>
         </Fragment>
       )
     }
@@ -248,8 +248,11 @@ class account_setting extends Component {
   };
 
   // 查看用户详细功能
-  checkUserRole = (id) => {
-    localStorage.setItem("accountAuthorityDetail", id);
+  checkUserRole = (rowInfo) => {
+    localStorage.setItem("accountAuthorityDetail", JSON.stringify({
+      id:rowInfo.id,
+      nickname:rowInfo.nickname
+    }));
     router.push("/authority/account_detail");
   };
 

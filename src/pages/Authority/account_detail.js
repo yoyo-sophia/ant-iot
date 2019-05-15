@@ -7,37 +7,38 @@ import StandardTable from "@/components/StandardTable";
 
 @connect(({ authority, loading }) => ({
   authority,
-  tableLoading: loading.effects['authority/fetch_account_detail']
+  tableLoading: loading.effects["authority/fetch_account_detail"]
 }))
 
 class account_detail extends Component {
 
   state = {
-    selectedRows:[],
-    curPartnerMenuList:[],
+    selectedRows: [],
+    curPartnerMenuList: [],
+    accountDetailInfo: JSON.parse(localStorage.getItem("accountAuthorityDetail"))
   };
 
   columns = [{
     title: "序号",
-    dataIndex: "id"
+    dataIndex: "menu_id"
   }, {
     title: "账号",
-    dataIndex: "name"
+    dataIndex: "nickname"
   },
     {
       title: "拥有权限",
-      dataIndex: "authorities"
+      dataIndex: "name"
     }];
 
   componentDidMount() {
     const { dispatch } = this.props;
-    let detail_id = localStorage.getItem('accountAuthorityDetail');
+    const { accountDetailInfo } = this.state;
     dispatch({
-      type:'authority/fetch_account_detail',
-      payload:{
-        partner_id:detail_id
+      type: "authority/fetch_account_detail",
+      payload: {
+        partner_id: accountDetailInfo.id
       }
-    })
+    });
   };
 
   // 获取当前角色已有权限---扁平化数组
@@ -52,22 +53,36 @@ class account_detail extends Component {
     });
   };
 
+
   render() {
-    const { authority:{accountDetailData}, tableLoading } = this.props;
-    const { selectedRows } = this.state;
+    const { authority: { accountDetailData }, tableLoading } = this.props;
+    const { curPartnerMenuList, accountDetailInfo } = this.state;
 
-    // 过滤table数据
-    let filterAccountDetail = accountDetailData.data.rows.length ? this.getItem(accountDetailData.data.rows).filter(item => !item.is_top) : [];
+    this.getItem(accountDetailData.data.rows);
+    let newTableData = {
+      rows: []
+    };
 
-    console.log(filterAccountDetail);
+    if (accountDetailData.data.rows.length) {
+      let filterTable = curPartnerMenuList.filter(item => !item.is_top);
+      newTableData = {
+        rows: filterTable.filter(function(item, index, self) {
+          return self.indexOf(item) === index;
+        }).map((item, index) => {
+          item.nickname = accountDetailInfo.nickname;
+          item.id = index;
+          return item;
+        })
+      };
+    }
 
     return (
       <PageHeaderWrapper title="账号权限详情">
         <Card>
           <StandardTable
-            selectedRows={selectedRows}
+            selectedRows={[]}
             loading={tableLoading}
-            data={accountDetailData.data}
+            data={newTableData}
             columns={this.columns}
           />
         </Card>
