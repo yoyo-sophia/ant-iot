@@ -47,7 +47,13 @@ export default {
         pagination:{},
       }
     },// 角色详情
-    editedRole:'', //修改编辑后的数据
+    editedRole:'', // 角色修改编辑后的数据
+    apiList:{
+      data:[]
+    }, // api数据
+    nodeApiList:{
+      rows:[],
+    } // 节点拥有的api列表
   },
   effects:{
     /*
@@ -92,13 +98,6 @@ export default {
       }else{
         const { resolve } = payload;
         resolve(response);
-        // if(response.state === 1){
-        //   yield put({
-        //     type:'saveAllRoleList',
-        //     payload:response
-        //   });
-        // }
-
       };
     },// 角色列表
     *add_role({payload,callback},{call,put}){
@@ -138,14 +137,14 @@ export default {
       const response = yield call(editMenuNode,payload);
       yield put({
         type:'saveManipulationNode',
-        payload:response
+        payload:response,
       })
     },// 修改节点
     *deleteMenuNode({payload,callback},{call,put}){
       const response = yield call(deleteMenuNode,payload);
       yield put({
         type:'saveManipulationNode',
-        payload:response
+        payload:response,
       });
       callback(response);
     },// 删除节点
@@ -155,19 +154,28 @@ export default {
     * */
     *get_api_list({payload,callback},{call,put}){
       const response = yield call(apiList);
-      callback(response);
+      yield put({
+        type:'saveApiList',
+        payload:response,
+      });
     },// 获取api列表
-    *dispatch_api_to_menu({payload,callback},{call,put}){
-      const response = yield call(dispatchApiToMenu);
-      callback(response);
+    *dispatch_api_to_menu({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(dispatchApiToMenu,payload.params);
+      resolve(response);
     },// 给菜单分配api
-    *get_menu_cur_api({payload,callback},{call,put}){
-      const response = yield call(getMenuCurApi);
-      callback(response)
+    *get_menu_cur_api({payload},{call,put}){
+      const response = yield call(getMenuCurApi,payload);
+      yield put({
+        type:'saveNodeApiList',
+        payload:response,
+      })
+
     },// 获取子节点api列表
-    *delete_menu_api({payload,callback},{call,put}){
-      const response = yield call(deleteMenuApi);
-      callback(response);
+    *delete_menu_api({payload},{call,put}){
+      const { resolve } =  payload;
+      const response = yield call(deleteMenuApi,payload.params);
+      resolve(response);
     },// 移除菜单api
   },
   reducers: {
@@ -224,7 +232,26 @@ export default {
         ...state,
         modifyState:action.payload
       }
-    }
-
+    },
+    /*
+    * api相关呢
+    * */
+    saveApiList(state,action){
+     return{
+       ...state,
+       apiList:{
+         ...action.payload
+       }
+     }
+    },//接口列表
+    saveNodeApiList(state,action){
+      return{
+        ...state,
+        nodeApiList:{
+          rows:data.action.payload.data,
+          ...action.payload
+        }
+      }
+    },// 节点拥有的api列表
   }
 }

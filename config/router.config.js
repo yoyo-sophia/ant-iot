@@ -7,7 +7,6 @@ export default [
       { path: '/user', redirect: '/user/login' },
       { path: '/user/login', component: './User/Login' },
       { path: '/user/register', component: './User/Register' },
-      // { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
   // app
@@ -60,6 +59,10 @@ export default [
             name:'账号设置',
             component:'./Authority/account_setting'
           },{
+            path:'/authority/api_setting',
+            name:'接口设置',
+            component:'./Authority/api_setting'
+          },{
             path:'/authority/account_detail',
             name:'账号权限详情',
             component:'./Authority/account_detail'
@@ -67,55 +70,6 @@ export default [
         ]
 
       },//权限节点
-
-
-      // forms
-      // {
-      //   path: '/form',
-      //   icon: 'form',
-      //   name: 'form',
-      //   routes: [
-      //     {
-      //       path: '/form/basic-form',
-      //       name: 'basicform',
-      //       component: './Forms/BasicForm',
-      //     },
-      //     {
-      //       path: '/form/step-form',
-      //       name: 'stepform',
-      //       component: './Forms/StepForm',
-      //       hideChildrenInMenu: true,
-      //       routes: [
-      //         {
-      //           path: '/form/step-form',
-      //           redirect: '/form/step-form/info',
-      //         },
-      //         {
-      //           path: '/form/step-form/info',
-      //           name: 'info',
-      //           component: './Forms/StepForm/Step1',
-      //         },
-      //         {
-      //           path: '/form/step-form/confirm',
-      //           name: 'confirm',
-      //           component: './Forms/StepForm/Step2',
-      //         },
-      //         {
-      //           path: '/form/step-form/result',
-      //           name: 'result',
-      //           component: './Forms/StepForm/Step3',
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       path: '/form/advanced-form',
-      //       name: 'advancedform',
-      //       authority: ['admin'],
-      //       component: './Forms/AdvancedForm',
-      //     },
-      //   ],
-      // },
-      // list
       {
         path: '/list',
         icon: 'table',
@@ -188,22 +142,7 @@ export default [
             component: './Profile/AdvancedProfile',
           },
         ],
-      },
-      // {
-      //   name: 'result',
-      //   icon: 'check-circle-o',
-      //   path: '/result',
-      //   routes: [
-      //     // result
-      //     {
-      //       path: '/result/success',
-      //       name: 'success',
-      //       component: './Result/Success',
-      //     },
-      //     { path: '/result/fail', name: 'fail', component: './Result/Error' },
-      //   ],
-      // },
-      {
+      }, {
         name: 'exception',
         icon: 'warning',
         path: '/exception',

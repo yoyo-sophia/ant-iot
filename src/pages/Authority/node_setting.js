@@ -238,8 +238,6 @@ class node_setting extends Component {
         node_role: choose_menu_data.is_top === 1 ? 1 : 2
       });
 
-      console.log(choose_menu_data);
-
       this.setState({
         curSelectNodeID: choose_menu_data.menu_id,
         curSelectNodeName: choose_menu_data.name,
