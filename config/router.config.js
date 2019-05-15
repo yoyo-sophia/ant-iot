@@ -66,6 +66,10 @@ export default [
             path:'/authority/account_detail',
             name:'账号权限详情',
             component:'./Authority/account_detail'
+          },{
+            path:'/authority/role_detail',
+            name:'角色下代理商列表',
+            component:'./Authority/role_detail'
           }
         ]
 

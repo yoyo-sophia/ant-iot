@@ -13,6 +13,7 @@ import {
   editRole, // 编辑角色
   dispatchAuthorityToRole, // 分配角色权限
   getCurRoleAuthority, // 获取当前角色权限
+  getRolePartnerList, // 获取角色下的代理商账号列表
 
   // 节点相关操作
   createMenuNode, // 创建节点
@@ -30,6 +31,9 @@ import {
 export default {
   namespace:'authority',
   state:{
+    /*
+    * 账号相关数据
+    * */
     accountData: {
       data:{
         rows:[],
@@ -42,6 +46,9 @@ export default {
       }
     },// 账号权限详情列表,
     saveCreateAccount:'',// 创建账号后保存数据
+    /*
+    * 角色相关数据
+    * */
     roleData:{
       data:{
         rows:[],
@@ -49,6 +56,14 @@ export default {
       }
     },// 角色详情
     editedRole:'', // 角色修改编辑后的数据
+    rolePartnerList:{
+      data:{
+        rows:[],
+      }
+    }, // 角色下的代理商账号
+    /*
+    * 接口设置相关列表数据
+    * */
     apiList:{
       data:[]
     }, // api数据
@@ -131,7 +146,14 @@ export default {
     *fetch_curRole_authority({payload,callback},{call,put}){
       const response = yield call(getCurRoleAuthority,payload);
       callback(response);
-    },//获取角色列表当前拥有的权限
+    },// 获取角色列表当前拥有的权限
+    *fetch_role_partner_list({payload},{call,put}){
+      const response = yield call(getRolePartnerList,payload);
+      yield put({
+        type:'saveRolePartnerList',
+        payload:response
+      })
+    },// 获取角色下代理商列表
 
     /*
     * 节点相关
@@ -212,7 +234,7 @@ export default {
         ...state,
         saveCreateAccount:action.payload
       }
-    },// 创建账号
+    },// 创建账号 可能有bug
     /*
     * 角色相关
     * */
@@ -229,7 +251,15 @@ export default {
         ...state,
         editedRole:action.payload
       }
-    },
+    }, // 修改角色 有bug需要更改回调形式
+    saveRolePartnerList(state,action){
+      return{
+        ...state,
+        rolePartnerList:{
+          ...action.payload,
+        }
+      }
+    }, // 角色下的代理商列表
 
     /*
     * 节点相关

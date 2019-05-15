@@ -279,6 +279,14 @@ export async function getCurRoleAuthority(params) {
   });
 }
 
+// 获取角色下的代理商列表
+export async function getRolePartnerList(params){
+  return request('/iot/v1/partners/authority/partner_list',{
+    method:'GET',
+    payload:params
+  })
+}
+
 
 /*
 * 账号相关

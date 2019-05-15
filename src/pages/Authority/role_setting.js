@@ -202,7 +202,7 @@ class roleSetting extends Component {
         <Divider type="vertical"/>
         <a onClick={() => this.removeRole(record)}>移除</a>
         <Divider type="vertical"/>
-        <a onClick={() => this.checkRolePartnerDetail(record.id)}>查看</a>
+        <a onClick={() => this.checkRolePartnerDetail(record)}>查看</a>
       </Fragment>
     )
   }
@@ -293,8 +293,10 @@ class roleSetting extends Component {
   };
 
   // 查看详情
-  checkRolePartnerDetail = (id) => {
-    localStorage.setItem("rolePartnerDetailId", id);
+  checkRolePartnerDetail = (rowInfo) => {
+    localStorage.setItem("rolePartnerDetail", JSON.stringify({
+      id:rowInfo.id
+    }));
     router.push("/authority/role_detail");
   };
 
