@@ -123,16 +123,8 @@ class account_setting extends Component {
   state = {
     selectedRows: [],
     // 分配角色相数据
-    roleLists: [{
-      id: 1,
-      name: "代理商"
-    }, {
-      id: 2,
-      name: "财务"
-    }, {
-      id: 3,
-      name: "客服"
-    }],// 角色数据列表
+    rowInfo:{},
+    roleLists:[], // 角色数据列表
     roleInitialLists: [1, 3], // 当前账号已有角色数据
     modalVisible: false, // 分配角色弹窗控制参数
     // 创建账号相关参数
@@ -173,6 +165,12 @@ class account_setting extends Component {
     render:(text,record) =>{
       if(!record.authority_list.length){
         return '-'
+      }else{
+        let roleStr = ''
+        record.authority_list.map(item=>{
+          roleStr += `${item.authority_name},`
+        })
+        return roleStr
       }
     },
   }, {
@@ -188,7 +186,7 @@ class account_setting extends Component {
       title: "操作",
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleRoles(true)}>编辑</a>
+          <a onClick={() => this.handleRoles(true,record)}>编辑</a>
           <Divider type="vertical"/>
           <a onClick={() => this.checkUserRole(record.id)}>查看账号权限</a>
         </Fragment>
@@ -201,10 +199,52 @@ class account_setting extends Component {
   /* 列表操作相关 */
 
   // 分配角色权限
-  handleRoles = (flag) => {
-    this.setState({
-      modalVisible: !!flag
-    });
+  handleRoles = (flag,rowInfo) => {
+    const { dispatch, authority, } =  this.props;
+    const { roleLists} =  this.state;
+
+    if(rowInfo){
+     //获取角色列表及当前账号已有角色数据
+
+      // 处理当前账号已有的角色数据
+      let curAccountRoleList = [] ;
+      if(rowInfo.authority_list.length){
+        rowInfo.authority_list.map(item=>{
+          curAccountRoleList.push(item.authority_id);
+        })
+      }
+      this.setState({
+        roleInitialLists:curAccountRoleList,
+        rowInfo:rowInfo,
+      });
+      if(!roleLists.length){
+        new Promise(resolve =>{
+          dispatch({
+            type:'authority/fetch_role_list',
+            payload:{
+              resolve
+            },
+          })
+        }).then((res)=>{
+          if(res.state === 1){
+            this.setState({
+              roleLists:res.data.rows,
+              modalVisible: !!flag
+            });
+          }else{
+            message.error(res.msg);
+          }
+        });// 请求所有角色数据
+      }else{
+        this.setState({
+          modalVisible: !!flag
+        });
+      }
+    }else{
+      this.setState({
+        modalVisible: !!flag
+      });
+    }
   };
 
   // 查看用户详细功能
@@ -218,6 +258,43 @@ class account_setting extends Component {
     this.setState({
       modalVisible: !!flag
     });
+  };
+
+  // 分配角色给账号
+  dispatchRoleToAccount = (params) =>{
+    const { dispatch, authority } = this.props;
+    const { rowInfo ,initialPagination} = this.state;
+    new Promise(resolve=>{
+      dispatch({
+        type:'authority/dispatch_role_to_account',
+        payload:{
+          params:{
+            partner_id:rowInfo.id,
+            authority_id_list:params.roleListItem,
+          },
+          resolve
+        },
+      });
+    }).then(res=>{
+      if(res.state===1){
+        if(res.state ===1){
+          message.success('分配角色成功');
+          this.handleModalVisible();
+          // 刷新列表
+          dispatch({
+            type: "authority/fetch_account_list",
+            payload: {
+              limit: authority.accountData.data.pagination.page_size || initialPagination.pageSize,
+              offset: authority.accountData.data.pagination.current || initialPagination.current,
+            },
+          })
+
+        }else {
+          message.error(res.msg);
+        }
+      }
+    });
+
   };
 
   /*
@@ -236,6 +313,7 @@ class account_setting extends Component {
     });
   };
 
+  // 创建顶级代理商确定事件
   submitCreateAccount = (fieldValue) =>{
     const { dispatch, authority:{ saveCreateAccount,accountData } } = this.props;
     const { initialPagination } = this.state;
@@ -279,8 +357,9 @@ class account_setting extends Component {
 
   // 创建账号
   renderCreateButton(){
-    const { user:{ currentUser} } = this.props;
-    if(currentUser.authority_list[0].authority_id === 1){
+    let currentUser = JSON.parse(localStorage.getItem('userInfo')),
+        curLoginAccountId = currentUser.authority_list[0].authority_id;
+    if(curLoginAccountId === 1){
       return this.createTopButton()
     }else{
       return ''
@@ -295,7 +374,7 @@ class account_setting extends Component {
 
     // 分配角色参数数据
     const dispatchMethod = {
-      handleAdd: this.handleAdd,
+      handleAdd: this.dispatchRoleToAccount,
       handleModalVisible: this.handleModalVisible,
       editRoleData: this.state.editRoleData,
       roleLists: roleLists,

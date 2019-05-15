@@ -18,8 +18,10 @@ export default {
     },
     *fetchCurrent(_, { call, put }) {
       const response = yield call(queryCurrent);
-      // response.data.name = 'Serati Ma';
       response.data.avatar = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+      if(response.state === 1){
+        localStorage.setItem('userInfo',JSON.stringify(response.data));
+      }
       yield put({
         type: 'saveCurrentUser',
         payload: response.data,

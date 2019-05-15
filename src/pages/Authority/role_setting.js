@@ -139,7 +139,6 @@ const DispatchAuthority = (props) => {
 
 };
 
-
 @connect(({ menu, authority, user, loading }) => ({
   menuData: menu.menuData,
   authority,
@@ -215,8 +214,10 @@ class roleSetting extends Component {
     dispatch({
       type: "authority/fetch_role_list",
       payload: {
-        limit: initialPagination.pageSize,
-        offset: initialPagination.current
+        params:{
+          limit: initialPagination.pageSize,
+          offset: initialPagination.current
+        }
       }
     });
   }
@@ -310,7 +311,9 @@ class roleSetting extends Component {
 
     dispatch({
       type: "authority/fetch_role_list",
-      payload: params
+      payload: {
+        params:params
+      }
     });
   };
   /*
@@ -364,8 +367,10 @@ class roleSetting extends Component {
           dispatch({
             type: "authority/fetch_role_list",
             payload: {
-              limit: authority.roleData.data.pagination.page_size,
-              offset: authority.roleData.data.pagination.current
+              params:{
+                limit: authority.roleData.data.pagination.page_size,
+                offset: authority.roleData.data.pagination.current
+              }
             },
           });
         }else{

@@ -309,7 +309,7 @@ export async function createTopAccount(params) {
 }
 // 给账号分配角色
 export async function dispatchRoleToAccount(params) {
-  return request('/iot/v1/authorities/authority/allocation',{
+  return request('/iot/v1/partners/authority/allocation',{
     method:'POST',
     body:params
   })
