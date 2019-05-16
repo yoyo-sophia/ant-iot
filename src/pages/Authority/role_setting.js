@@ -17,6 +17,8 @@ import {
 import StandardTable from "@/components/StandardTable";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
 
+import style from "./css/node-setting.less";
+
 const FormItem = Form.Item;
 const { TreeNode } = Tree;
 
@@ -140,7 +142,7 @@ const DispatchAuthority = Form.create()((props) => {
   menuData: menu.menuData,
   authority,
   userInfo: user.currentUser,
-  loading: loading
+  tableLoading: loading.effects["authority/fetch_role_list"]
 }))
 
 // 分配权限
@@ -152,7 +154,7 @@ class roleSetting extends Component {
     * */
     modalVisible: false,
     selectedRows: [],
-    formValues: {},
+    formValues: {}, // table其他参数
     // 编辑权限相关参数
     editRoleData: {
       name: "",
@@ -223,18 +225,18 @@ class roleSetting extends Component {
   * 列表相关操作
   * */
   // refreshTable
-  refreshTable = (isFirstPage) => {
-    const { dispatch } = this.props;
-    const { initialPagination } = this.state;
-    const { authority } = this.props;
+  refreshTable = (isFirstPage, params) => {
+    const { dispatch, authority } = this.props;
+    const { initialPagination, formValues } = this.state;
     let pageSize = authority.roleData.data.pagination.page_size ? authority.roleData.data.pagination.page_size : initialPagination.pageSize,
-        current = isFirstPage ? 1 : authority.roleData.data.pagination.current;
+      current = isFirstPage ? 1 : authority.roleData.data.pagination.current;
     dispatch({
       type: "authority/fetch_role_list",
       payload: {
         params: {
+          ...params,
           limit: pageSize,
-          offset: current,
+          offset: current
         }
       }
     });
@@ -297,9 +299,9 @@ class roleSetting extends Component {
             type: "authority/delete_role",
             payload: {
               params: {
-                authority_id: params.id,
+                authority_id: params.id
               },
-              resolve,
+              resolve
             }
           });
         }).then(res => {
@@ -318,10 +320,10 @@ class roleSetting extends Component {
 
   // 查看详情
   checkRolePartnerDetail = (rowInfo) => {
-    if(rowInfo.count === 0){
-      message.success('此角色下暂无代理商');
-      return
-    }else{
+    if (rowInfo.count === 0) {
+      message.success("此角色下暂无代理商");
+      return;
+    } else {
       localStorage.setItem("rolePartnerDetail", JSON.stringify({
         name: rowInfo.name,
         id: rowInfo.id
@@ -361,13 +363,12 @@ class roleSetting extends Component {
       });
     } else {
       form.resetFields({
-        name:'',
-        description:''
+        name: "",
+        description: ""
       });
       this.setState({
         editRoleData: { name: "", description: "", isEdit: false }
       });
-      console.log(111);
     }
     this.setState({
       modalVisible: !!flag
@@ -486,14 +487,33 @@ class roleSetting extends Component {
     });
   };
 
+  // table搜索
+  tableSearch = (e) => {
+    e.preventDefault();
+    const { formValues } = this.state;
+    const { form } = this.props;
+    form.validateFields((err, fieldValue) => {
+      if (fieldValue.search) {
+        this.setState({ formValues: { search: fieldValue.search } });
+        this.refreshTable(true, { search: fieldValue.search }); // 刷新表格
+      } else {
+        this.setState({ formValues: { search: null } });
+        this.refreshTable(true, {});// 刷新表格
+      }
+    });
+  };
+
   render() {
     const {
       authority: { roleData },
-      loading,
-      menuData
+      tableLoading,
+      menuData,
+      form
     } = this.props;
 
-    const { modalVisible, defaultSelectedKeys } = this.state;
+    const { getFieldDecorator } = form;
+
+    const { modalVisible, defaultSelectedKeys, search } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -510,18 +530,22 @@ class roleSetting extends Component {
       submitAuthoritySetting: this.submitAuthoritySetting// 提交表单
     };
 
-    const tableLoading = {
-      loading: loading.effects["authority/fetch_role_list"]
-    }; // 表格加载loading
-
     return (
       <PageHeaderWrapper title="角色设置">
-        <Card bordered={false}>
-          <div>
-            <Button type="primary" onClick={() => this.handleModalVisible(true)}>添加角色</Button>
+        <Card bordered={false} className={style.settingWrap}>
+          <div className={style.toolBar}>
+            <Form layout="inline" onSubmit={this.tableSearch}>
+              <Button type="primary" onClick={() => this.handleModalVisible(true)}>添加角色</Button>
+              <Form.Item>
+                {getFieldDecorator("search")(
+                  <Input placeholder="请输入角色名称"/>
+                )}
+              </Form.Item>
+              <Button htmlType="submit">搜索</Button>
+            </Form>
           </div>
           <StandardTable
-            loading={tableLoading.loading}
+            loading={tableLoading}
             data={roleData.data}
             selectedRows={[]}
             columns={this.columns}

@@ -4,6 +4,7 @@ import { Row, Col, Tree, Card, Form, Input, Button, Divider, Checkbox, Modal, me
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
 import StandardTable from "@/components/StandardTable";
 import router from "umi/router";
+import style from "./css/node-setting.less";
 
 const FormItem = Form.Item;
 
@@ -56,7 +57,6 @@ const DispatchRoleModal = Form.create()((props) => {
     </Modal>
   );
 });
-
 // 创建账号
 const CreateTopPartner = Form.create()((props) => {
   const {
@@ -116,11 +116,12 @@ const CreateTopPartner = Form.create()((props) => {
 @connect(({ authority, user, loading }) => ({
   user,
   authority,
-  tableLoading: loading.effects["authority/fetch_account_list"],//table loading
+  tableLoading: loading.effects["authority/fetch_account_list"]//table loading
 }))
 
 class account_setting extends Component {
   state = {
+    search: "",
     selectedRows: [],
     // 分配角色相数据
     rowInfo: {},
@@ -135,6 +136,7 @@ class account_setting extends Component {
       mobile: ""
     },
     // 表格相关数据
+    formValues: {}, // table其他参数
     initialPagination: {
       current: 1,
       pageSize: 10
@@ -195,19 +197,18 @@ class account_setting extends Component {
   };
 
   // 刷新表格
-  refreshTable = (isFirstPage) => {
-    const { dispatch } = this.props;
+  refreshTable = (isFirstPage,params) => {
+    const { dispatch, authority } = this.props;
     const { initialPagination } = this.state;
-    const { authority } = this.props;
+
     let pageSize = authority.accountData.data.pagination.page_size ? authority.accountData.data.pagination.page_size : initialPagination.pageSize,
       current = isFirstPage ? 1 : authority.accountData.data.pagination.current;
     dispatch({
       type: "authority/fetch_account_list",
       payload: {
-        params: {
-          limit: pageSize,
-          offset: current,
-        }
+        ...params,
+        limit: pageSize,
+        offset: current
       }
     });
   };
@@ -282,26 +283,26 @@ class account_setting extends Component {
   };
 
   // 启用或关闭账号
-  changeAccountStatus = (rowInfo) =>{
+  changeAccountStatus = (rowInfo) => {
     const { dispatch } = this.props;
     let _this = this;
     new Promise(resolve => {
       dispatch({
-        type:'authority/change_account_status',
-        payload:{
-          params:{
-            partner_id:rowInfo.id,
-            status:rowInfo.status === 1 ? 0 : 1,
+        type: "authority/change_account_status",
+        payload: {
+          params: {
+            partner_id: rowInfo.id,
+            status: rowInfo.status === 1 ? 0 : 1
           },
-          resolve,
+          resolve
         }
       });
-    }).then(res=>{
-      if(res.state===1){
-        message.success('修改账号状态成功');
+    }).then(res => {
+      if (res.state === 1) {
+        message.success("修改账号状态成功");
         // 刷新操作
-       _this.refreshTable();
-      }else {
+        _this.refreshTable();
+      } else {
         message.error(res.msg);
       }
     });
@@ -362,15 +363,15 @@ class account_setting extends Component {
       dispatch({
         type: "authority/create_top_account",
         payload: {
-          params:{
+          params: {
             nickname: fieldValue.nickname,
             password: fieldValue.password,
             mobile: fieldValue.mobile
           },
-          resolve,
+          resolve
         }
       });
-    }).then(res=>{
+    }).then(res => {
       if (res.state === 1) {
         message.success("创建账号成功");
         this.createAccountHandleModal(false);
@@ -405,11 +406,57 @@ class account_setting extends Component {
     }
   };
 
+  // 表格操作变化变化
+  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    const { dispatch } = this.props;
+    const { formValues } = this.state;
+
+    const params = {
+      offset: pagination.current,
+      limit: pagination.pageSize,
+      ...formValues
+    };
+
+    dispatch({
+      type: "authority/fetch_account_list",
+      payload: params
+    });
+  };
+
+  // 表格搜索
+  tableSearch = (e) => {
+    e.preventDefault();
+    const { formValues, initialPagination } = this.state;
+    const { form, authority } = this.props;
+    form.validateFields((err, fieldValue) => {
+      if (fieldValue.search) {
+        this.setState({
+          formValues: {
+            search: fieldValue.search
+          }
+        });
+        // 刷新表格
+        this.refreshTable(true,{
+          search: fieldValue.search
+        });
+      } else {
+        this.setState({
+          formValues: {
+            search: null
+          }
+        });
+        // 刷新表格
+        this.refreshTable(true,{})
+      }
+    });
+  };
+
 
   /*dom结构渲染*/
   render() {
-    const { authority: { accountData }, tableLoading } = this.props;
+    const { authority: { accountData }, tableLoading, form } = this.props;
     const { selectedRows, roleLists, roleInitialLists, modalVisible } = this.state;
+    const { getFieldDecorator } = form;
 
     // 分配角色参数数据
     const dispatchMethod = {
@@ -430,13 +477,26 @@ class account_setting extends Component {
 
     return (
       <PageHeaderWrapper title="账号设置">
-        <Card>
-          <div>{this.renderCreateButton()}</div>
+        <Card className={style.settingWrap}>
+
+          <div className={style.toolBar}>
+            <Form layout="inline" onSubmit={this.tableSearch}>
+              {this.renderCreateButton()}
+              <Form.Item>
+                {getFieldDecorator("search")(
+                  <Input placeholder="请输入账号名称"/>
+                )}
+              </Form.Item>
+              <Button htmlType="submit">搜索</Button>
+            </Form>
+          </div>
+
           <StandardTable
             selectedRows={selectedRows}
             loading={tableLoading}
             data={accountData.data}
             columns={this.columns}
+            onChange={this.handleStandardTableChange}
           />
 
           {/*分配权限*/}
