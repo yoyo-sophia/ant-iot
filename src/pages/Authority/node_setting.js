@@ -22,7 +22,7 @@ class node_setting extends Component {
     curSelectNodeID: "",
     curSelectNodeName: "",
     curSelectKey: [],
-    curSelectMenuData: {},
+    curSelectMenuData: null,
 
     currentNodeIndex: "",
     nodeList: [],
@@ -84,9 +84,10 @@ class node_setting extends Component {
     const { isAdd, curSelectMenuData } = this.state;
     const { dispatch, routes } = this.props;
     e.preventDefault();
+
     if (!isAdd) {
       if (!this.state.curSelectNodeID) {
-        message.error("请选择需要修改的节点或选择新增节点");
+        message.error("请选择新增节点或选择主节点");
         return;
       }
     }
@@ -113,19 +114,67 @@ class node_setting extends Component {
                   type: "menu/getMenuData",
                   payload: { routes }
                 });
-              }else {
+              } else {
                 message.error(res.msg);
               }
-            }
-
+            },
           });
         } else {
           // 修改菜单
         }
-        console.log("Recevied values of form", values);
       }
     });
   };
+
+  // 渲染编辑节点按钮
+  renderBtnEdit(menuList) {
+    if (menuList.length) return (<Button id="btnNodeEdit" onClick={() => this.editNode()}>编辑</Button>);
+    return "";
+  };
+
+
+  // 编辑节点事件
+  editNode() {
+    const { dispatch, routes, form } = this.props;
+    const { curSelectMenuData } = this.state;
+    if (!curSelectMenuData) {
+      message.error("请选择需要修改的节点");
+      return;
+    } else {
+      if (curSelectMenuData.is_top && !curSelectMenuData.icon) {
+        message.error("主节点必须设置图标");
+        return;
+      }
+      form.validateFields((err, values) => {
+        if (!err) {
+          dispatch({
+            type: "authority/editMenuNode",
+            payload: {
+              name: values.node_name,
+              url: values.node_url,
+              position: values.node_sort,
+              is_top: values.node_role === 1 ? 1 : 0,
+              icon: values.node_icon,
+              menu_id: curSelectMenuData.menu_id
+            },
+            callback: (res) => {
+              if (res.state === 1) {
+                message.success("新增节点成功");
+                dispatch({
+                  type: "menu/getMenuData",
+                  payload: { routes }
+                });
+              } else {
+                message.error(res.msg);
+              }
+            },
+          });
+        }
+      });
+
+    }
+  };
+
 
   /*dom结构渲染*/
   render() {
@@ -181,7 +230,7 @@ class node_setting extends Component {
       });
     };
 
-    /*删除节点*/
+    // 删除节点
     const deleteNode = () => {
       const { dispatch, routes } = this.props;
       const { curSelectNodeID, curSelectNodeName } = this.state;
@@ -207,10 +256,10 @@ class node_setting extends Component {
                       type: "menu/getMenuData",
                       payload: { routes }
                     });
-                    resolve
+                    resolve;
                   } else {
                     message.error(authority.modifyState.msg);
-                    reject
+                    reject;
                   }
                 });
 
@@ -221,7 +270,7 @@ class node_setting extends Component {
       }
     };
 
-    /*选择节点*/
+    // 选择节点
     const onSelect = (selectedKeys) => {
       let choose_menu_data = {};
       this.state.newMenuList
@@ -356,8 +405,10 @@ class node_setting extends Component {
                     </Radio.Group>
                   )}
                 </Form.Item>
-
-                <Button className={style.btnSubmit} type="primary" htmlType="submit">提交</Button>
+                <div className={style.btnSubmit}>
+                  {this.renderBtnEdit(menuData)}
+                  <Button id="btnAddNode" type="primary" htmlType="submit">提交</Button>
+                </div>
 
               </Form>
             </Col>

@@ -45,7 +45,6 @@ export default {
         rows:[],
       }
     },// 账号权限详情列表,
-    saveCreateAccount:'',// 创建账号后保存数据
     /*
     * 角色相关数据
     * */
@@ -55,7 +54,6 @@ export default {
         pagination:{},
       }
     },// 角色详情
-    editedRole:'', // 角色修改编辑后的数据
     rolePartnerList:{
       data:{
         rows:[],
@@ -89,12 +87,10 @@ export default {
         payload:response,
       });
     },// 账号权限详情
-    *create_top_account({payload,callback},{call,put}){
-      const response = yield call(createTopAccount,payload);
-      yield put({
-        type:'saveCreateAccount',
-        payload:response
-      })
+    *create_top_account({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(createTopAccount,payload.params);
+      resolve(response);
     },//创建顶级账号
     *dispatch_role_to_account({payload},{call,put}){
       const { resolve } = payload;
@@ -122,22 +118,20 @@ export default {
         resolve(response);
       };
     },// 角色列表
-    *add_role({payload,callback},{call,put}){
-      const response = yield call(addRole,payload);
-      callback(response);
+    *add_role({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(addRole,payload.params);
+      resolve(response);
     },
-    *delete_role({payload,callback},{call,put}){
-      const response = yield call(deleteRole,payload);
-      callback(response);
+    *delete_role({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(deleteRole,payload.params);
+      resolve(response);
     },// 删除角色
-    *edit_role({payload,callback},{call,put}){
-      const response = yield call(editRole,payload);
-      yield put({
-        type:'saveEditRole',
-        payload:response
-      })
-      // callback(response);
-
+    *edit_role({payload},{call,put}){
+      const { resolve } = payload;
+      const response = yield call(editRole,payload.params);
+      resolve(response);
     },// 编辑角色
     *dispatch_authority_to_role({payload,callback},{call,put}){
       const response = yield call(dispatchAuthorityToRole,payload);
@@ -162,19 +156,12 @@ export default {
       const response = yield call(createMenuNode,payload);
       callback(response);
     },// 创建节点
-    *editMenuNode({payload},{call,put}){
+    *editMenuNode({payload,callback},{call,put}){
       const response = yield call(editMenuNode,payload);
-      yield put({
-        type:'saveManipulationNode',
-        payload:response,
-      })
+      callback(response);
     },// 修改节点
     *deleteMenuNode({payload,callback},{call,put}){
       const response = yield call(deleteMenuNode,payload);
-      yield put({
-        type:'saveManipulationNode',
-        payload:response,
-      });
       callback(response);
     },// 删除节点
 
@@ -228,13 +215,7 @@ export default {
           }
         },
       }
-    }, // 账号列表详情
-    saveCreateAccount(state,action){
-      return{
-        ...state,
-        saveCreateAccount:action.payload
-      }
-    },// 创建账号 可能有bug
+    },// 账号列表详情
     /*
     * 角色相关
     * */
@@ -245,13 +226,7 @@ export default {
           ...action.payload,
         },
       }
-    }, // 角色列表
-    saveEditRole(state,action){
-      return{
-        ...state,
-        editedRole:action.payload
-      }
-    }, // 修改角色 有bug需要更改回调形式
+    },// 角色列表
     saveRolePartnerList(state,action){
       return{
         ...state,
@@ -259,17 +234,7 @@ export default {
           ...action.payload,
         }
       }
-    }, // 角色下的代理商列表
-
-    /*
-    * 节点相关
-    * */
-    saveManipulationNode(state,action){
-      return{
-        ...state,
-        modifyState:action.payload
-      }
-    },
+    },// 角色下的代理商列表
     /*
     * api相关呢
     * */
@@ -280,7 +245,7 @@ export default {
          ...action.payload
        }
      }
-    },//接口列表
+    },// 接口列表
     saveNodeApiList(state,action){
       return{
         ...state,

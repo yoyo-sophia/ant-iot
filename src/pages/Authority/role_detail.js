@@ -10,7 +10,6 @@ import StandardTable from "@/components/StandardTable";
 }))
 
 class role_detail extends Component{
-
   state = {
     roleDetailInfo:JSON.parse(localStorage.getItem('rolePartnerDetail')),
     initialPagination: {
@@ -42,9 +41,9 @@ class role_detail extends Component{
 
   render(){
     const { authority:{rolePartnerList}, tableLoading } = this.props;
-
+    const { roleDetailInfo } = this.state;
     return(
-      <PageHeaderWrapper title='角色下的代理商账号'>
+      <PageHeaderWrapper title={`${roleDetailInfo.name}-代理商列表`}>
         <Card>
           <StandardTable
             selectedRows={[]}

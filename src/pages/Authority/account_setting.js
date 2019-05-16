@@ -141,18 +141,6 @@ class account_setting extends Component {
     }
   };
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-    const { initialPagination } = this.state;
-    dispatch({
-      type: "authority/fetch_account_list",
-      payload: {
-        limit: initialPagination.pageSize,
-        offset: initialPagination.current
-      }
-    });
-  };
-
   columns = [{
     title: "序号",
     dataIndex: "id"
@@ -192,8 +180,37 @@ class account_setting extends Component {
         <a onClick={() => this.checkUserRole(record)}>查看账号权限</a>
       </Fragment>
     )
-  }
-  ];
+  }];
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    const { initialPagination } = this.state;
+    dispatch({
+      type: "authority/fetch_account_list",
+      payload: {
+        limit: initialPagination.pageSize,
+        offset: initialPagination.current
+      }
+    });
+  };
+
+  // 刷新表格
+  refreshTable = (isFirstPage) => {
+    const { dispatch } = this.props;
+    const { initialPagination } = this.state;
+    const { authority } = this.props;
+    let pageSize = authority.accountData.data.pagination.page_size ? authority.accountData.data.pagination.page_size : initialPagination.pageSize,
+      current = isFirstPage ? 1 : authority.accountData.data.pagination.current;
+    dispatch({
+      type: "authority/fetch_account_list",
+      payload: {
+        params: {
+          limit: pageSize,
+          offset: current,
+        }
+      }
+    });
+  };
 
   /*
   * 列表操作相关
@@ -266,8 +283,8 @@ class account_setting extends Component {
 
   // 启用或关闭账号
   changeAccountStatus = (rowInfo) =>{
-    const { dispatch, authority } = this.props;
-    const {initialPagination} = this.state;
+    const { dispatch } = this.props;
+    let _this = this;
     new Promise(resolve => {
       dispatch({
         type:'authority/change_account_status',
@@ -283,25 +300,18 @@ class account_setting extends Component {
       if(res.state===1){
         message.success('修改账号状态成功');
         // 刷新操作
-        dispatch({
-          type: "authority/fetch_account_list",
-          payload: {
-            limit: authority.accountData.data.pagination.page_size || initialPagination.pageSize,
-            offset: authority.accountData.data.pagination.current || initialPagination.current
-          }
-        });
+       _this.refreshTable();
       }else {
         message.error(res.msg);
       }
     });
-
-
   };
 
   // 分配角色给账号
   dispatchRoleToAccount = (params) => {
-    const { dispatch, authority } = this.props;
-    const { rowInfo, initialPagination } = this.state;
+    const { dispatch } = this.props;
+    const { rowInfo } = this.state;
+    let _this = this;
     new Promise(resolve => {
       dispatch({
         type: "authority/dispatch_role_to_account",
@@ -319,14 +329,7 @@ class account_setting extends Component {
           message.success("分配角色成功");
           this.handleModalVisible();
           // 刷新列表
-          dispatch({
-            type: "authority/fetch_account_list",
-            payload: {
-              limit: authority.accountData.data.pagination.page_size || initialPagination.pageSize,
-              offset: authority.accountData.data.pagination.current || initialPagination.current
-            }
-          });
-
+          _this.refreshTable();
         } else {
           message.error(res.msg);
         }
@@ -353,30 +356,28 @@ class account_setting extends Component {
 
   // 创建顶级代理商确定事件
   submitCreateAccount = (fieldValue) => {
-    const { dispatch, authority: { saveCreateAccount, accountData } } = this.props;
-    const { initialPagination } = this.state;
-    dispatch({
-      type: "authority/create_top_account",
-      payload: {
-        nickname: fieldValue.nickname,
-        password: fieldValue.password,
-        mobile: fieldValue.mobile
-      }
-    }).then(() => {
-      if (saveCreateAccount.state === 1) {
+    const { dispatch } = this.props;
+    let _this = this;
+    new Promise(resolve => {
+      dispatch({
+        type: "authority/create_top_account",
+        payload: {
+          params:{
+            nickname: fieldValue.nickname,
+            password: fieldValue.password,
+            mobile: fieldValue.mobile
+          },
+          resolve,
+        }
+      });
+    }).then(res=>{
+      if (res.state === 1) {
         message.success("创建账号成功");
         this.createAccountHandleModal(false);
         // 刷新列表
-        dispatch({
-          type: "authority/fetch_account_list",
-          payload: {
-            limit: accountData.data.pagination.page_size || initialPagination.pageSize,
-            offset: 1
-          }
-        });
+        _this.refreshTable(true);
       } else {
-        console.log(saveCreateAccount);
-        message.error(saveCreateAccount.msg);
+        message.error(res.msg);
       }
     });
   };

@@ -18,9 +18,7 @@ import StandardTable from "@/components/StandardTable";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper";
 
 const FormItem = Form.Item;
-const { Option } = Select;
 const { TreeNode } = Tree;
-const confirm = Modal.confirm;
 
 // 新增或编辑角色
 const ManipulationRole = Form.create()((props) => {
@@ -34,7 +32,6 @@ const ManipulationRole = Form.create()((props) => {
   const okHandle = () => {
     form.validateFields((err, fieldValue) => {
       if (err) return;
-      // form.resetFields();
       handleAdd(fieldValue);
     });
   };
@@ -65,9 +62,7 @@ const ManipulationRole = Form.create()((props) => {
     </Modal>
   );
 });
-
-// 分配权限
-const DispatchAuthority = (props) => {
+const DispatchAuthority = Form.create()((props) => {
   const state = {
     checkedKeys: [],
     expandedKeys: [],
@@ -137,7 +132,9 @@ const DispatchAuthority = (props) => {
     </Modal>
   );
 
-};
+});
+
+@Form.create()
 
 @connect(({ menu, authority, user, loading }) => ({
   menuData: menu.menuData,
@@ -146,6 +143,7 @@ const DispatchAuthority = (props) => {
   loading: loading
 }))
 
+// 分配权限
 
 class roleSetting extends Component {
   state = {
@@ -156,7 +154,6 @@ class roleSetting extends Component {
     selectedRows: [],
     formValues: {},
     // 编辑权限相关参数
-    editRoleModal: false,
     editRoleData: {
       name: "",
       description: "",
@@ -166,7 +163,7 @@ class roleSetting extends Component {
     * 权限分配相关参数
     * */
     subNodeList: null, // 后台结束菜单id合集
-    selectedRoleMenudIdList:[],// 当前选中角色所所拥有权限的id
+    selectedRoleMenudIdList: [],// 当前选中角色所所拥有权限的id
     showAuthorityModal: false,
     defaultSelectedKeys: [],
     roleListSelectedRow: {},
@@ -214,7 +211,7 @@ class roleSetting extends Component {
     dispatch({
       type: "authority/fetch_role_list",
       payload: {
-        params:{
+        params: {
           limit: initialPagination.pageSize,
           offset: initialPagination.current
         }
@@ -225,12 +222,30 @@ class roleSetting extends Component {
   /*
   * 列表相关操作
   * */
+  // refreshTable
+  refreshTable = (isFirstPage) => {
+    const { dispatch } = this.props;
+    const { initialPagination } = this.state;
+    const { authority } = this.props;
+    let pageSize = authority.roleData.data.pagination.page_size ? authority.roleData.data.pagination.page_size : initialPagination.pageSize,
+        current = isFirstPage ? 1 : authority.roleData.data.pagination.current;
+    dispatch({
+      type: "authority/fetch_role_list",
+      payload: {
+        params: {
+          limit: pageSize,
+          offset: current,
+        }
+      }
+    });
+  };
+
   // 分配权限Modal
   showAuthorityModal = (flag, data) => {
     if (data) {
       this.setState({
         roleListSelectedRow: data,
-        selectedRoleMenudIdList: [],
+        selectedRoleMenudIdList: []
       });
       const { dispatch } = this.props;
 
@@ -246,7 +261,7 @@ class roleSetting extends Component {
               this.getItem(res.data);
               menuIdList = this.state.selectedRoleMenudIdList.map(item => item.menu_id);
               this.setState({
-                defaultSelectedKeys:menuIdList
+                defaultSelectedKeys: menuIdList
               });
             }
             this.setState({
@@ -268,8 +283,10 @@ class roleSetting extends Component {
 
   // 移除角色
   removeRole = (params) => {
-    const { authority: { deleteRole }, dispatch } = this.props;
-    confirm({
+    const { dispatch } = this.props;
+    let _this = this;
+
+    const modal = Modal.confirm({
       title: "操作",
       content: `是否移除此'${params.name}'这个角色？`,
       okText: "确认",
@@ -279,14 +296,21 @@ class roleSetting extends Component {
           dispatch({
             type: "authority/delete_role",
             payload: {
-              authority_id: params.id
-            },
-            callback: (res) => {
-              res.state === 1 ? message.success("移除角色成功") : message.error(res.msg);
-              resolve;
+              params: {
+                authority_id: params.id,
+              },
+              resolve,
             }
           });
-
+        }).then(res => {
+          if (res.state === 1) {
+            modal.destroy();
+            message.success("删除角色成功");
+            // 刷新表格
+            _this.refreshTable();
+          } else {
+            message.error(res.msg);
+          }
         });
       }
     });
@@ -294,10 +318,16 @@ class roleSetting extends Component {
 
   // 查看详情
   checkRolePartnerDetail = (rowInfo) => {
-    localStorage.setItem("rolePartnerDetail", JSON.stringify({
-      id:rowInfo.id
-    }));
-    router.push("/authority/role_detail");
+    if(rowInfo.count === 0){
+      message.success('此角色下暂无代理商');
+      return
+    }else{
+      localStorage.setItem("rolePartnerDetail", JSON.stringify({
+        name: rowInfo.name,
+        id: rowInfo.id
+      }));
+      router.push("/authority/role_detail");
+    }
   };
 
   // 表格操作变化变化
@@ -314,7 +344,7 @@ class roleSetting extends Component {
     dispatch({
       type: "authority/fetch_role_list",
       payload: {
-        params:params
+        params: params
       }
     });
   };
@@ -324,88 +354,78 @@ class roleSetting extends Component {
   * isEdit 当前为修改数据还是新增数据 1：修改数据 2：新增数据
   * */
   handleModalVisible = (flag, data) => {
+    const { form } = this.props;
     if (flag && data) {
       this.setState({
         editRoleData: { ...data, isEdit: true }
       });
     } else {
+      form.resetFields({
+        name:'',
+        description:''
+      });
       this.setState({
         editRoleData: { name: "", description: "", isEdit: false }
       });
+      console.log(111);
     }
     this.setState({
       modalVisible: !!flag
     });
   };
 
-  // 编辑弹窗 控制
-  handleEditModal = flag => {
-    this.setState({
-      editRoleModal: !!flag
-    });
-  };
-
   // 创建或修改角色
   handleAdd = fields => {
-    const { dispatch,  authority, } = this.props;
+    const { dispatch } = this.props;
     const { editRoleData } = this.state;
     let _this = this;
     // 创建（编辑）角色
     if (editRoleData.isEdit) {
       // 编辑角色
-      dispatch({
-        type: "authority/edit_role",
-        payload: {
-          authority_id: editRoleData.id,
-          description: fields.description,
-          name: fields.name
-        },
-      }).then(()=>{
-        if(authority.editedRole.state===1){
-          message.success('修改数据成功');
+      new Promise(resolve => {
+        dispatch({
+          type: "authority/edit_role",
+          payload: {
+            params: {
+              authority_id: editRoleData.id,
+              description: fields.description,
+              name: fields.name
+            },
+            resolve
+          }
+        });
+      }).then(res => {
+        if (res.state === 1) {
+          message.success("修改数据成功");
           _this.handleModalVisible();
           // 刷新表格
-          console.log(authority);
-          dispatch({
-            type: "authority/fetch_role_list",
-            payload: {
-              params:{
-                limit: authority.roleData.data.pagination.page_size,
-                offset: authority.roleData.data.pagination.current
-              }
-            },
-          });
-        }else{
-          message.error(authority.editedRole.msg);
+          _this.refreshTable();
+        } else {
+          message.error(res.msg);
         }
       });
 
     } else {
       // 新增角色
-      dispatch({
-        type: "authority/add_role",
-        payload: {
-          name: fields.name,
-          description: fields.description
-        },
-        callback: (res) => {
-          if (res.state === 1) {
-            message.success("添加成功");
-            _this.handleModalVisible();
-            // 刷新表格
-            let tableParam = this.state.initialPagination;
-            authority.roleData.data.pagination ? tableParam.pageSize = authority.roleData.data.pagination.page_size : tableParam;
-            dispatch({
-              type: "authority/fetch_role_list",
-              payload: {
-                limit:tableParam.pageSize || tableParam.page_size,
-                offset:tableParam.current
-              },
-            });
-
-          } else {
-            message.error(res.msg);
+      new Promise(resolve => {
+        dispatch({
+          type: "authority/add_role",
+          payload: {
+            params: {
+              name: fields.name,
+              description: fields.description
+            },
+            resolve
           }
+        });
+      }).then(res => {
+        if (res.state === 1) {
+          message.success("添加成功");
+          _this.handleModalVisible();
+          // 刷新表格
+          _this.refreshTable(true);
+        } else {
+          message.error(res.msg);
         }
       });
     }
@@ -473,7 +493,7 @@ class roleSetting extends Component {
       menuData
     } = this.props;
 
-    const { modalVisible, editRoleModal, defaultSelectedKeys } = this.state;
+    const { modalVisible, defaultSelectedKeys } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
