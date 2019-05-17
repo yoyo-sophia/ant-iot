@@ -33,7 +33,7 @@ const DispatchRoleModal = Form.create()((props) => {
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
     >
-      <FormItem label="角色列表">
+      <FormItem>
         {
           form.getFieldDecorator("roleListItem", {
             initialValue: roleInitialLists
@@ -77,6 +77,8 @@ const CreateTopPartner = Form.create()((props) => {
   return (
     <Modal
       title="创建账号"
+      destroyOnClose
+      maskClosable
       visible={modalVisible}
       onOk={submit}
       onCancel={() => handleModalVisible()}

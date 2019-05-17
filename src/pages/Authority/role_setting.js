@@ -39,6 +39,8 @@ const ManipulationRole = Form.create()((props) => {
   };
   return (
     <Modal
+      destroyOnClose
+      maskClosable
       title={editRoleData.isEdit ? "编辑角色" : "创建角色"}
       visible={modalVisible}
       onOk={okHandle}
@@ -355,24 +357,30 @@ class roleSetting extends Component {
   * data 需要修改的数据
   * isEdit 当前为修改数据还是新增数据 1：修改数据 2：新增数据
   * */
-  handleModalVisible = (flag, data) => {
+  handleModalVisible = (flag, data,isBtnAdd) => {
     const { form } = this.props;
     if (flag && data) {
       this.setState({
-        editRoleData: { ...data, isEdit: true }
+        editRoleData: {
+          ...data,
+          isEdit: true,
+          modalVisible: !!flag,
+        }
       });
     } else {
-      form.resetFields({
-        name: "",
-        description: ""
-      });
+      if(isBtnAdd){
+        this.setState({
+          editRoleData: {
+            name: "",
+            description: "",
+            isEdit: false,
+          }
+        });
+      };
       this.setState({
-        editRoleData: { name: "", description: "", isEdit: false }
+        modalVisible: !!flag
       });
-    }
-    this.setState({
-      modalVisible: !!flag
-    });
+    };
   };
 
   // 创建或修改角色
@@ -535,7 +543,7 @@ class roleSetting extends Component {
         <Card bordered={false} className={style.settingWrap}>
           <div className={style.toolBar}>
             <Form layout="inline" onSubmit={this.tableSearch}>
-              <Button type="primary" onClick={() => this.handleModalVisible(true)}>添加角色</Button>
+              <Button type="primary" onClick={() => this.handleModalVisible(true,null,true)}>添加角色</Button>
               <Form.Item>
                 {getFieldDecorator("search")(
                   <Input placeholder="请输入角色名称"/>
